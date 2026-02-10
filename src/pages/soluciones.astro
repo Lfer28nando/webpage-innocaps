@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SolutionsPage from '../components/SolutionsPage.jsx';
+import { Header } from '../components/Header.jsx';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Soluciones - Innocaps Lab">
+    <main>
+        <Header client:load />
+        <SolutionsPage client:load />
+        <Footer />
+    </main>
+</Layout>

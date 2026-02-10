@@ -57,7 +57,7 @@ export function Header() {
           <nav className="hidden md:flex items-center gap-8">
             {[
               { label: 'Tecnología', href: '/tecnologia' },
-              { label: 'Soluciones', href: '#soluciones' },
+              { label: 'Soluciones', href: '/soluciones' },
               { label: 'Nosotros', href: '#nosotros' },
               { label: 'Proceso', href: '#proceso' },
             ].map((item) => (
