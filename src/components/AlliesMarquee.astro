@@ -1,0 +1,98 @@
+---
+// Nuestros Aliados - Infinite Marquee
+const allies = [
+  { name: 'Aliado 1', logo: '/allies/ally-1.svg' },
+  { name: 'Aliado 2', logo: '/allies/ally-2.svg' },
+  { name: 'Aliado 3', logo: '/allies/ally-3.svg' },
+  { name: 'Aliado 4', logo: '/allies/ally-4.svg' },
+  { name: 'Aliado 5', logo: '/allies/ally-5.svg' },
+  { name: 'Aliado 6', logo: '/allies/ally-6.svg' },
+];
+---
+
+<section class="relative bg-slate-950 py-24 overflow-hidden transition-colors duration-300">
+  <!-- Degradado superior -->
+  <div class="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-950 to-transparent z-10 pointer-events-none"></div>
+  
+  <!-- Degradado inferior -->
+  <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-950 to-transparent z-10 pointer-events-none"></div>
+
+  <!-- Fondo decorativo sutil -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-teal-500 rounded-full blur-[180px]"></div>
+  </div>
+
+  <!-- Grid de fondo -->
+  <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(20, 184, 166, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.4) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+  <!-- Título -->
+  <div class="container mx-auto px-6 relative z-10 mb-16">
+    <div class="text-center">
+      <h2 class="text-4xl md:text-6xl font-bold text-white mb-4">
+        Nuestros <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400">Aliados</span>
+      </h2>
+      <p class="text-lg text-slate-400 max-w-2xl mx-auto">
+        Colaboramos con líderes de la industria para impulsar la innovación biotecnológica
+      </p>
+    </div>
+  </div>
+
+  <!-- Marquee Container -->
+  <div class="relative z-10">
+    <!-- Fade edges -->
+    <div class="absolute left-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-r from-slate-950 to-transparent z-20 pointer-events-none"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-32 md:w-48 bg-gradient-to-l from-slate-950 to-transparent z-20 pointer-events-none"></div>
+
+    <!-- Track (duplicated for seamless loop) -->
+    <div class="marquee-track flex gap-12 md:gap-16">
+      {/* Primera copia */}
+      {allies.map((ally) => (
+        <div class="marquee-item flex-shrink-0 w-48 md:w-56 h-24 md:h-28 rounded-2xl border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center px-6 transition-all duration-300 hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-500/10 group">
+          <div class="flex flex-col items-center gap-2 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
+            <!-- Placeholder icon -->
+            <svg class="w-10 h-10 text-slate-500 group-hover:text-teal-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            <span class="text-xs text-slate-600 group-hover:text-slate-400 font-mono tracking-wide transition-colors duration-300">{ally.name}</span>
+          </div>
+        </div>
+      ))}
+      {/* Segunda copia (para el loop continuo) */}
+      {allies.map((ally) => (
+        <div class="marquee-item flex-shrink-0 w-48 md:w-56 h-24 md:h-28 rounded-2xl border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center px-6 transition-all duration-300 hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-500/10 group">
+          <div class="flex flex-col items-center gap-2 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
+            <svg class="w-10 h-10 text-slate-500 group-hover:text-teal-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            </svg>
+            <span class="text-xs text-slate-600 group-hover:text-slate-400 font-mono tracking-wide transition-colors duration-300">{ally.name}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Línea decorativa inferior -->
+  <div class="container mx-auto px-6 mt-16 relative z-10">
+    <div class="h-px bg-gradient-to-r from-transparent via-teal-500/30 to-transparent"></div>
+  </div>
+</section>
+
+<style>
+  .marquee-track {
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+</style>

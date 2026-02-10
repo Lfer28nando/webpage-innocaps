@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import HeroSection from '../components/HeroSection.jsx';
+import ProcessSection from '../components/ProcessSection.jsx';
+import BiotechPipeline from '../components/BiotechPipeline.astro';
+import ProfessionalsSection from '../components/ProfessionalsSection.jsx';
+import SectorsAccordion from '../components/SectorsAccordion.jsx';
+import AlliesMarquee from '../components/AlliesMarquee.astro';
+import { Header } from '../components/Header.jsx';
+---
+
+<Layout title="Innocaps Lab - Nanoencapsulación y Biotecnología">
+    <main>
+        <Header client:load />
+        
+        <HeroSection client:load />
+        
+        <ProcessSection client:load />
+        
+        <BiotechPipeline />
+        
+        <SectorsAccordion client:load />
+        
+        <ProfessionalsSection client:load />
+
+        <AlliesMarquee />
+
+    </main>
+</Layout>

@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/* Soporte para modo claro */
+@layer utilities {
+  .light {
+    /* Aplicar automáticamente a elementos hijos */
+  }
+  
+  /* Clases que responden al modo claro */
+  .light .bg-slate-950 {
+    @apply bg-slate-50;
+  }
+  
+  .light .bg-slate-900 {
+    @apply bg-slate-100;
+  }
+  
+  .light .bg-slate-800 {
+    @apply bg-slate-200;
+  }
+  
+  .light .text-white {
+    @apply text-slate-900;
+  }
+  
+  .light .text-slate-300 {
+    @apply text-slate-700;
+  }
+  
+  .light .text-slate-400 {
+    @apply text-slate-600;
+  }
+  
+  .light .border-slate-800 {
+    @apply border-slate-300;
+  }
+  
+  .light .border-slate-700 {
+    @apply border-slate-400;
+  }
+  
+  .light .from-slate-950 {
+    @apply from-slate-50;
+  }
+  
+  .light .from-slate-900 {
+    @apply from-slate-100;
+  }
+  
+  .light .to-slate-950 {
+    @apply to-slate-50;
+  }
+  
+  .light .to-slate-900 {
+    @apply to-slate-100;
+  }
+  
+  .light .via-slate-950 {
+    @apply via-slate-100;
+  }
+}

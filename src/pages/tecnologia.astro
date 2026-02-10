@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TechnologyPage from '../components/TechnologyPage.jsx';
+import { Header } from '../components/Header.jsx';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Tecnología - Innocaps Lab">
+    <main>
+        <Header client:load />
+        <TechnologyPage client:load />
+        <Footer />
+    </main>
+</Layout>
