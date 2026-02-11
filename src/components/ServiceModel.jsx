@@ -208,7 +208,7 @@ export default function ServiceModel() {
         >
           <div className="inline-flex flex-col sm:flex-row items-center gap-4">
             <a
-              href="#contacto"
+              href="/contacto"
               className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white font-bold text-sm tracking-wide transition-all duration-300 shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30"
             >
               <span>Iniciar Co-Innovación</span>
@@ -229,7 +229,7 @@ export default function ServiceModel() {
             </a>
             <span className="text-slate-600 text-sm">o</span>
             <a
-              href="#ecosistema"
+              href="/soluciones"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-slate-700/50 bg-slate-900/30 text-slate-400 hover:text-white hover:border-slate-600 font-medium text-sm transition-all duration-300"
             >
               Explorar ecosistemas
