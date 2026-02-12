@@ -1,6 +1,7 @@
-import { useRef, useMemo } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import GlossaryTooltip from './GlossaryTooltip';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 /* ═══════════════════════════════════
    ANIMATION HELPERS
@@ -20,7 +21,7 @@ const stagger = (d = 0) => ({
 /* ═══════════════════════════════════
    SPRAY DRYER DIAGRAM (SVG)
    ═══════════════════════════════════ */
-function SprayDryerDiagram({ progress }) {
+function SprayDryerDiagram({ progress, particleCount = 20 }) {
   // Inlet temp interpolation: 160°C → 120°C as scroll progresses (showing range)
   const inletTemp = Math.round(160 - progress * 40);
   // Outlet temp: starts hidden, appears at ~50-65°C range
@@ -112,7 +113,7 @@ function SprayDryerDiagram({ progress }) {
 
       {/* Animated particles inside dryer */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => {
+        {Array.from({ length: particleCount }).map((_, i) => {
           const left = 30 + Math.random() * 40; // percentage
           const delay = Math.random() * 3;
           const duration = 2 + Math.random() * 2;
@@ -240,6 +241,7 @@ const controlPoints = [
    ═══════════════════════════════════ */
 export default function SprayDryingSection() {
   const sectionRef = useRef(null);
+  const isMobile = useIsMobile();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start end', 'end start'],
@@ -248,12 +250,14 @@ export default function SprayDryingSection() {
   const progress = useTransform(scrollYProgress, [0.2, 0.8], [0, 1]);
 
   return (
-    <section ref={sectionRef} className="relative bg-slate-950 py-28 lg:py-36 overflow-hidden">
-      {/* Background accents */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/[0.03] rounded-full blur-[180px]" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-500/[0.04] rounded-full blur-[180px]" />
-      </div>
+    <section ref={sectionRef} className={`relative bg-slate-950 overflow-hidden ${isMobile ? 'py-20' : 'py-28 lg:py-36'}`}>
+      {/* Background accents — reduced on mobile */}
+      {!isMobile && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-orange-500/[0.03] rounded-full blur-[180px]" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-teal-500/[0.04] rounded-full blur-[180px]" />
+        </div>
+      )}
 
       {/* Grid pattern */}
       <div
@@ -265,17 +269,17 @@ export default function SprayDryingSection() {
         }}
       />
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+      <div className={`container mx-auto relative z-10 ${isMobile ? 'px-5' : 'px-4 sm:px-6'}`}>
         {/* ── Header ── */}
         <motion.div {...fadeUp} className="mb-6">
-          <span className="inline-block px-4 py-1.5 text-[10px] font-bold tracking-[0.3em] uppercase text-orange-400 border border-orange-500/20 rounded-full bg-orange-500/5 mb-8">
+          <span className={`inline-block px-4 py-1.5 text-[10px] font-bold tracking-[0.3em] uppercase text-orange-400 border border-orange-500/20 rounded-full bg-orange-500/5 ${isMobile ? 'mb-5' : 'mb-8'}`}>
             Bloque 3 — Animación de Proceso
           </span>
         </motion.div>
 
         <motion.h2
           {...stagger(0.1)}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 max-w-4xl"
+          className={`font-bold text-white mb-4 max-w-4xl ${isMobile ? 'text-3xl' : 'text-4xl md:text-6xl lg:text-7xl'}`}
         >
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-400 to-teal-400">
             Vitrificación
@@ -283,20 +287,20 @@ export default function SprayDryingSection() {
           Instantánea
         </motion.h2>
 
-        <motion.p {...stagger(0.2)} className="text-slate-400 text-lg max-w-3xl mb-6 leading-relaxed">
+        <motion.p {...stagger(0.2)} className={`text-slate-400 max-w-3xl mb-6 leading-[1.5] ${isMobile ? 'text-base' : 'text-lg leading-relaxed'}`}>
           Convertimos líquidos vivos en polvos estables sin matar la bioactividad. El secreto está
           en el control térmico de milisegundos.
         </motion.p>
 
-        <motion.p {...stagger(0.25)} className="text-slate-600 text-sm font-mono tracking-wider uppercase mb-16">
+        <motion.p {...stagger(0.25)} className={`text-slate-600 text-sm font-mono tracking-wider uppercase ${isMobile ? 'mb-10' : 'mb-16'}`}>
           Termodinámica del Secado por Spray Drying
         </motion.p>
 
         {/* ── Main layout: Diagram + Control Points ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-          {/* Spray Dryer Diagram */}
+        <div className={`grid gap-10 items-start ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-1 lg:grid-cols-2 lg:gap-16'}`}>
+          {/* Spray Dryer Diagram — fewer particles on mobile */}
           <motion.div {...stagger(0.3)}>
-            <SprayDryerDiagram progress={0.5} />
+            <SprayDryerDiagram progress={0.5} particleCount={isMobile ? 8 : 20} />
           </motion.div>
 
           {/* Control Points */}
@@ -308,7 +312,7 @@ export default function SprayDryingSection() {
                 className="group"
               >
                 <div
-                  className={`relative rounded-2xl border ${cp.borderColor} ${cp.bgColor} p-6 lg:p-7 overflow-hidden transition-all duration-300 hover:bg-opacity-10`}
+                  className={`relative rounded-2xl border ${cp.borderColor} ${cp.bgColor} overflow-hidden transition-all duration-300 hover:bg-opacity-10 ${isMobile ? 'p-5' : 'p-6 lg:p-7'}`}
                 >
                   {/* Number badge */}
                   <div className="flex items-start gap-4 mb-4">
@@ -323,8 +327,8 @@ export default function SprayDryingSection() {
                       {cp.number}
                     </span>
                     <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="text-lg font-bold text-white">{cp.label}</h4>
+                      <div className="flex items-center gap-3 mb-1 flex-wrap">
+                        <h4 className={`font-bold text-white ${isMobile ? 'text-base' : 'text-lg'}`}>{cp.label}</h4>
                         {cp.badge && (
                           <span
                             className="px-2 py-0.5 text-[9px] font-bold tracking-widest uppercase rounded-full"
@@ -339,7 +343,7 @@ export default function SprayDryingSection() {
                         )}
                       </div>
                       <span
-                        className="text-2xl font-mono font-bold"
+                        className={`font-mono font-bold ${isMobile ? 'text-xl' : 'text-2xl'}`}
                         style={{ color: cp.color }}
                       >
                         {cp.temp}
@@ -347,8 +351,8 @@ export default function SprayDryingSection() {
                     </div>
                   </div>
 
-                  <p className="text-slate-300 text-sm leading-relaxed mb-2">{cp.action}</p>
-                  <p className="text-slate-500 text-sm leading-relaxed">{cp.detail}</p>
+                  <p className="text-slate-300 text-sm leading-[1.6] mb-2">{cp.action}</p>
+                  <p className="text-slate-500 text-sm leading-[1.6]">{cp.detail}</p>
 
                   {/* Temp gauge for inlet/outlet */}
                   {cp.number !== '03' && (
@@ -362,25 +366,27 @@ export default function SprayDryingSection() {
                     </div>
                   )}
 
-                  {/* Hover glow */}
-                  <div
-                    className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r ${cp.gradient} opacity-0 group-hover:opacity-50 transition-opacity duration-500`}
-                  />
+                  {/* Hover glow — desktop only */}
+                  {!isMobile && (
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r ${cp.gradient} opacity-0 group-hover:opacity-50 transition-opacity duration-500`}
+                    />
+                  )}
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
 
-        {/* ── WebGL Particle Behavior Note (Dev Note 2) ── */}
-        <motion.div {...stagger(0.6)} className="mt-20">
-          <div className="relative rounded-2xl border border-slate-800/40 bg-slate-900/30 p-8 lg:p-10 overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
+        {/* ── WebGL Particle Behavior Note ── */}
+        <motion.div {...stagger(0.6)} className={isMobile ? 'mt-12' : 'mt-20'}>
+          <div className={`relative rounded-2xl border border-slate-800/40 bg-slate-900/30 overflow-hidden ${isMobile ? 'p-5' : 'p-8 lg:p-10'}`}>
+            <div className={`flex gap-6 ${isMobile ? 'flex-col' : 'flex-col md:flex-row md:items-center md:gap-10'}`}>
               {/* Fluid → Frozen visual */}
-              <div className="flex items-center gap-6 flex-shrink-0">
+              <div className="flex items-center gap-6 flex-shrink-0 justify-center">
                 {/* Fluid state */}
                 <div className="relative w-20 h-20 rounded-xl border border-orange-500/20 bg-orange-500/5 flex items-center justify-center overflow-hidden">
-                  {[...Array(8)].map((_, i) => (
+                  {[...Array(isMobile ? 5 : 8)].map((_, i) => (
                     <motion.div
                       key={`fluid-${i}`}
                       className="absolute w-1.5 h-1.5 rounded-full bg-orange-400"
@@ -408,7 +414,7 @@ export default function SprayDryingSection() {
 
                 {/* Frozen state */}
                 <div className="relative w-20 h-20 rounded-xl border border-teal-500/20 bg-teal-500/5 flex items-center justify-center overflow-hidden">
-                  {[...Array(8)].map((_, i) => (
+                  {[...Array(isMobile ? 5 : 8)].map((_, i) => (
                     <div
                       key={`frozen-${i}`}
                       className="absolute w-1.5 h-1.5 rounded-full bg-teal-400"
@@ -424,7 +430,7 @@ export default function SprayDryingSection() {
 
               {/* Description */}
               <div>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <p className={`text-slate-400 leading-[1.6] ${isMobile ? 'text-sm text-center' : 'text-sm'}`}>
                   Las partículas se comportan como fluido al principio y se &ldquo;congelan&rdquo;
                   en el aire al llegar a la temperatura de salida de 50°C. La transición de
                   líquido a sólido vítreo ocurre en milisegundos, preservando la estructura
@@ -437,7 +443,7 @@ export default function SprayDryingSection() {
       </div>
 
       {/* Bottom separator */}
-      <div className="container mx-auto px-6 mt-24">
+      <div className={`container mx-auto px-6 ${isMobile ? 'mt-16' : 'mt-24'}`}>
         <div className="h-px bg-gradient-to-r from-transparent via-slate-800 to-transparent" />
       </div>
     </section>

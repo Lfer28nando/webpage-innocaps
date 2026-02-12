@@ -503,18 +503,19 @@ export default function ProcessSection() {
   };
 
   return (
-    <section className="relative bg-slate-950 light:bg-slate-100 py-32 overflow-hidden transition-colors duration-300">
+    <section className="relative bg-slate-950 light:bg-slate-100 py-20 md:py-32 overflow-hidden transition-colors duration-300">
       {/* Degradado superior */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-950 light:from-slate-100 to-transparent z-20 pointer-events-none"></div>
       
       {/* Degradado inferior */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 light:from-slate-100 to-transparent z-20 pointer-events-none"></div>
       
-      {/* Fondo decorativo mejorado */}
-      <div className="absolute inset-0 opacity-20">
+      {/* Fondo decorativo — hidden on mobile for perf */}
+      <div className="hidden md:block absolute inset-0 opacity-20">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-teal-500 rounded-full blur-[150px] animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-500 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
+      )}
 
       {/* Grid de fondo */}
       <div className="absolute inset-0 opacity-5">
@@ -524,14 +525,14 @@ export default function ProcessSection() {
         }} />
       </div>
 
-      <div className="container mx-auto px-2 sm:px-4 lg:px-6 relative z-10 max-w-[98%] lg:max-w-7xl">
+      <div className="container mx-auto relative z-10 px-5 md:px-2 md:max-w-[98%] lg:max-w-7xl sm:px-4 lg:px-6">
         {/* Título de sección */}
-        <div className="text-center mb-20">
+        <div className="text-center mb-10 md:mb-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-7xl font-bold text-white mb-6"
+            className="font-bold text-white mb-4 text-3xl md:text-5xl lg:text-7xl md:mb-6"
           >
             Nuestra <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400">Tecnología</span>
           </motion.h2>
@@ -540,184 +541,182 @@ export default function ProcessSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-xl text-slate-400 max-w-3xl mx-auto"
+            className="text-slate-400 max-w-3xl mx-auto text-base leading-[1.5] md:text-xl"
           >
             Tres pilares tecnológicos que transforman bioactivos en ingredientes funcionales superiores
           </motion.p>
         </div>
 
-        {/* Tabs de navegación */}
-        <div className="flex justify-center gap-4 mb-16">
-          {processSteps.map((step, index) => (
-            <motion.button
-              key={step.id}
-              onClick={() => setActiveIndex(index)}
-              className={`px-8 py-4 rounded-full font-semibold transition-all duration-300 ${
-                activeIndex === index
-                  ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-900 shadow-lg shadow-teal-500/50'
-                  : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-700'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{step.icon}</span>
-                <span className="hidden md:inline">{step.title}</span>
-              </div>
-            </motion.button>
-          ))}
-        </div>
+        {/* ── MOBILE: Vertical timeline with full cards ── */}
+        <div className="md:hidden">
+          <div className="relative">
+            {/* Vertical line */}
+            <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-teal-500/60 via-cyan-500/40 to-blue-500/20" />
 
-        {/* Acordeón horizontal de 3 columnas */}
-        <div className="flex flex-col md:flex-row gap-4 md:h-auto lg:h-[700px]">
-          {processSteps.map((step, index) => {
-            const isActive = activeIndex === index;
-            
-            return (
-              <motion.div
-                key={step.id}
-                initial={false}
-                animate={{
-                  flex: isActive ? 2 : 0.5,
-                }}
-                transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                className={`relative cursor-pointer overflow-hidden rounded-3xl ${
-                  isActive ? 'min-h-[550px] md:min-h-[600px] lg:min-h-0' : 'min-h-[80px] md:min-h-0'
-                }`}
-                onClick={() => setActiveIndex(index)}
-                onMouseEnter={() => setActiveIndex(index)}
-              >
-                {/* Tarjeta */}
-                <div className={`relative w-full h-full border-2 rounded-3xl transition-all duration-300 ${
-                  isActive 
-                    ? 'border-teal-500/50 shadow-2xl shadow-teal-500/20' 
-                    : 'border-slate-700/50 hover:border-slate-600'
-                }`}>
-                  {/* Fondo con gradiente */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 to-slate-950/95 backdrop-blur-sm" />
-                  
-                  {/* Layout horizontal cuando está expandido */}
-                  {isActive ? (
-                    <div className="absolute inset-0 flex flex-col lg:flex-row items-center gap-4 lg:gap-8 p-5 lg:p-8">
-                      {/* Columna izquierda: Visualización animada */}
-                      <motion.div 
-                        className="w-full lg:w-2/5 h-[40%] lg:h-full flex items-center justify-center shrink-0"
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                      >
-                        <VisualState state={getStateForIndex(index)} />
-                      </motion.div>
-
-                      {/* Columna derecha: Contenido */}
-                      <motion.div 
-                        className="w-full lg:flex-1 h-[60%] lg:h-full flex flex-col justify-start lg:justify-center space-y-3 lg:space-y-6 pr-0 lg:pr-4 overflow-y-auto"
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center text-2xl lg:text-3xl shadow-lg shadow-teal-500/40">
-                            {step.icon}
-                          </div>
-                          <div>
-                            <p className="text-xs text-teal-400 font-bold tracking-widest uppercase mb-1">
-                              Paso {step.id}
-                            </p>
-                            <h3 className="text-xl lg:text-3xl font-bold text-white">{step.title}</h3>
-                          </div>
-                        </div>
-                        
-                        <h4 className="text-lg lg:text-2xl font-semibold bg-gradient-to-r from-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                          {step.subtitle}
-                        </h4>
-                        
-                        <p className="text-sm lg:text-base text-slate-300 leading-relaxed">
-                          {step.description}
-                        </p>
-
-                        {/* Beneficios */}
-                        {step.benefits && (
-                          <div className="space-y-3 pt-2">
-                            {step.benefits.map((benefit, i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 0.5 + i * 0.1 }}
-                                className="flex items-start gap-3"
-                              >
-                                <div className="w-2 h-2 mt-2 bg-teal-400 rounded-full flex-shrink-0" />
-                                <div>
-                                  <p className="text-teal-300 font-semibold text-sm">{benefit.label}</p>
-                                  <p className="text-slate-400 text-xs">{benefit.detail}</p>
-                                </div>
-                              </motion.div>
-                            ))}
-                          </div>
-                        )}
-                      </motion.div>
-                    </div>
-                  ) : (
-                    // Layout vertical cuando está colapsado
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
-                      <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center text-2xl mb-4 shadow-lg">
-                        {step.icon}
-                      </div>
-                      <h3 
-                        className="text-2xl font-bold text-white text-center mb-2"
-                        style={{ 
-                          writingMode: isActive ? 'horizontal-tb' : 'vertical-rl', 
-                          textOrientation: 'mixed' 
-                        }}
-                      >
-                        {step.title}
-                      </h3>
-                      <p className="text-sm text-teal-400 font-semibold tracking-wider uppercase">
-                        Paso {step.id}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Indicador de activo */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeIndicator"
-                      className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500"
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Información adicional de la tarjeta activa (solo mobile) */}
-        <motion.div
-          key={activeIndex}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="lg:hidden bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-800 p-6"
-        >
-          <h3 className="text-2xl font-bold text-white mb-4">{processSteps[activeIndex].title}</h3>
-          <p className="text-slate-300 mb-6">{processSteps[activeIndex].description}</p>
-          
-          {processSteps[activeIndex].benefits && (
-            <div className="space-y-3">
-              {processSteps[activeIndex].benefits.map((benefit, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-2 h-2 mt-2 bg-teal-400 rounded-full flex-shrink-0" />
-                  <div>
-                    <p className="text-teal-300 font-semibold">{benefit.label}</p>
-                    <p className="text-slate-400 text-sm">{benefit.detail}</p>
+            <div className="space-y-8">
+              {processSteps.map((step, index) => (
+                <motion.div
+                  key={step.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="relative pl-14"
+                >
+                  {/* Timeline node */}
+                  <div className="absolute left-3 top-5 w-7 h-7 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-teal-500/30 z-10">
+                    <span className="text-slate-900 text-xs font-bold">{step.id}</span>
                   </div>
-                </div>
+
+                  {/* Card */}
+                  <div className="bg-slate-900/70 border border-slate-700/50 rounded-2xl p-5 space-y-3">
+                    {/* Header row */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{step.icon}</span>
+                      <div>
+                        <p className="text-[10px] text-teal-400 font-bold tracking-widest uppercase">Paso {step.id}</p>
+                        <h3 className="text-lg font-bold text-white leading-tight">{step.title}</h3>
+                      </div>
+                    </div>
+
+                    {/* Subtitle */}
+                    <h4 className="text-sm font-semibold bg-gradient-to-r from-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                      {step.subtitle}
+                    </h4>
+
+                    {/* Description */}
+                    <p className="text-sm text-slate-300 leading-[1.6]">{step.description}</p>
+
+                    {/* Benefits */}
+                    {step.benefits && (
+                      <div className="grid grid-cols-1 gap-2 pt-2">
+                        {step.benefits.map((benefit, i) => (
+                          <div key={i} className="flex items-start gap-2.5 bg-slate-800/50 rounded-xl p-3">
+                            <div className="w-1.5 h-1.5 mt-1.5 bg-teal-400 rounded-full flex-shrink-0" />
+                            <div>
+                              <p className="text-teal-300 font-semibold text-xs">{benefit.label}</p>
+                              <p className="text-slate-400 text-xs leading-[1.5]">{benefit.detail}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
               ))}
             </div>
-          )}
-        </motion.div>
+          </div>
+        </div>
+
+        {/* ── DESKTOP: Original accordion ── */}
+        <div className="hidden md:block">
+          <>
+            {/* Tabs de navegación */}
+            <div className="flex justify-center gap-4 mb-16">
+              {processSteps.map((step, index) => (
+                <motion.button
+                  key={step.id}
+                  onClick={() => setActiveIndex(index)}
+                  className={`px-8 py-4 rounded-full font-semibold transition-all duration-300 ${
+                    activeIndex === index
+                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-slate-900 shadow-lg shadow-teal-500/50'
+                      : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-700'
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">{step.icon}</span>
+                    <span className="hidden md:inline">{step.title}</span>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Acordeón horizontal de 3 columnas */}
+            <div className="flex flex-col md:flex-row gap-4 md:h-auto lg:h-[700px]">
+              {processSteps.map((step, index) => {
+                const isActive = activeIndex === index;
+                
+                return (
+                  <motion.div
+                    key={step.id}
+                    initial={false}
+                    animate={{ flex: isActive ? 2 : 0.5 }}
+                    transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                    className={`relative cursor-pointer overflow-hidden rounded-3xl ${
+                      isActive ? 'min-h-[550px] md:min-h-[600px] lg:min-h-0' : 'min-h-[80px] md:min-h-0'
+                    }`}
+                    onClick={() => setActiveIndex(index)}
+                    onMouseEnter={() => setActiveIndex(index)}
+                  >
+                    <div className={`relative w-full h-full border-2 rounded-3xl transition-all duration-300 ${
+                      isActive 
+                        ? 'border-teal-500/50 shadow-2xl shadow-teal-500/20' 
+                        : 'border-slate-700/50 hover:border-slate-600'
+                    }`}>
+                      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/95 to-slate-950/95 backdrop-blur-sm" />
+                      
+                      {isActive ? (
+                        <div className="absolute inset-0 flex flex-col lg:flex-row items-center gap-4 lg:gap-8 p-5 lg:p-8">
+                          <motion.div 
+                            className="w-full lg:w-2/5 h-[40%] lg:h-full flex items-center justify-center shrink-0"
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                          >
+                            <VisualState state={getStateForIndex(index)} />
+                          </motion.div>
+                          <motion.div 
+                            className="w-full lg:flex-1 h-[60%] lg:h-full flex flex-col justify-start lg:justify-center space-y-3 lg:space-y-6 pr-0 lg:pr-4 overflow-y-auto"
+                            initial={{ opacity: 0, x: 50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-2xl flex items-center justify-center text-2xl lg:text-3xl shadow-lg shadow-teal-500/40">
+                                {step.icon}
+                              </div>
+                              <div>
+                                <p className="text-xs text-teal-400 font-bold tracking-widest uppercase mb-1">Paso {step.id}</p>
+                                <h3 className="text-xl lg:text-3xl font-bold text-white">{step.title}</h3>
+                              </div>
+                            </div>
+                            <h4 className="text-lg lg:text-2xl font-semibold bg-gradient-to-r from-cyan-300 to-teal-300 bg-clip-text text-transparent">{step.subtitle}</h4>
+                            <p className="text-sm lg:text-base text-slate-300 leading-relaxed">{step.description}</p>
+                            {step.benefits && (
+                              <div className="space-y-3 pt-2">
+                                {step.benefits.map((benefit, i) => (
+                                  <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.1 }} className="flex items-start gap-3">
+                                    <div className="w-2 h-2 mt-2 bg-teal-400 rounded-full flex-shrink-0" />
+                                    <div>
+                                      <p className="text-teal-300 font-semibold text-sm">{benefit.label}</p>
+                                      <p className="text-slate-400 text-xs">{benefit.detail}</p>
+                                    </div>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            )}
+                          </motion.div>
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                          <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center text-2xl mb-4 shadow-lg">{step.icon}</div>
+                          <h3 className="text-2xl font-bold text-white text-center mb-2" style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}>{step.title}</h3>
+                          <p className="text-sm text-teal-400 font-semibold tracking-wider uppercase">Paso {step.id}</p>
+                        </div>
+                      )}
+
+                      {isActive && (
+                        <motion.div layoutId="activeIndicator" className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-cyan-500" transition={{ type: "spring", stiffness: 500, damping: 30 }} />
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </>
+        </div>
       </div>
     </section>
   );

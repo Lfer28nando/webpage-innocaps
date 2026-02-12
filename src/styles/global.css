@@ -109,3 +109,37 @@
   animation-delay: -1s;
   opacity: 0.4;
 }
+
+/* ─────────────────────────────────────────────
+   MOBILE-FIRST GLOBAL STYLES
+   ───────────────────────────────────────────── */
+
+/* Better readability on mobile */
+@media (max-width: 768px) {
+  /* Paragraph & body text: taller line-height for readability */
+  p,
+  li,
+  dd {
+    line-height: 1.6;
+  }
+
+  /* Ensure minimum touch target on interactive elements */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+  }
+
+  /* Prevent horizontal scroll from any rogue element */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Full-width CTA pattern */
+  .mobile-full-cta {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+}

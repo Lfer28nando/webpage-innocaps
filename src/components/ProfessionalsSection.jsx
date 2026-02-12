@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 const professionals = [
   {
@@ -53,46 +54,50 @@ const professionals = [
 ];
 
 export default function ProfessionalsSection() {
+  const isMobile = useIsMobile();
+
   return (
-    <section className="relative bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 light:from-slate-200 light:via-slate-100 light:to-slate-200 py-32 overflow-hidden transition-colors duration-300">
+    <section className={`relative bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 light:from-slate-200 light:via-slate-100 light:to-slate-200 overflow-hidden transition-colors duration-300 ${isMobile ? 'py-20' : 'py-32'}`}>
       {/* Degradado superior */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-950 light:from-slate-200 to-transparent z-10 pointer-events-none"></div>
       
       {/* Degradado inferior */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-900 light:from-slate-200 to-transparent z-10 pointer-events-none"></div>
       
-      {/* Efectos de fondo */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
+      {/* Efectos de fondo — reduced on mobile */}
+      {!isMobile && (
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-20 left-10 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"></div>
+          </div>
+          <div className="absolute inset-0 opacity-10" style={{
+            backgroundImage: 'linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px'
+          }}></div>
         </div>
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: 'linear-gradient(rgba(20, 184, 166, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 184, 166, 0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }}></div>
-      </div>
+      )}
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className={`container mx-auto relative z-10 ${isMobile ? 'px-5' : 'px-6'}`}>
         {/* Header */}
         <motion.div 
-          className="text-center mb-20"
+          className={`text-center ${isMobile ? 'mb-10' : 'mb-20'}`}
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+          <h2 className={`font-bold text-white mb-4 ${isMobile ? 'text-3xl' : 'text-5xl md:text-6xl mb-6'}`}>
             Nuestros <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-cyan-400 to-blue-400">Profesionales y Aliados</span>
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 mx-auto mb-6"></div>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+          <div className="w-24 h-1 bg-gradient-to-r from-teal-500 to-cyan-500 mx-auto mb-4 md:mb-6"></div>
+          <p className={`text-slate-400 max-w-3xl mx-auto ${isMobile ? 'text-base leading-[1.5]' : 'text-xl'}`}>
             Un equipo multidisciplinario de expertos comprometidos con la excelencia científica y la innovación
           </p>
         </motion.div>
 
         {/* Grid de profesionales */}
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className={`max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${isMobile ? 'gap-4' : 'gap-8'}`}>
           {professionals.map((person, index) => (
             <motion.div
               key={person.id}
@@ -100,10 +105,10 @@ export default function ProfessionalsSection() {
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: 0.6, delay: isMobile ? index * 0.05 : index * 0.1 }}
             >
               {/* Tarjeta */}
-              <div className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 h-full transition-all duration-500 hover:border-teal-500/50 hover:shadow-2xl hover:shadow-teal-500/20 hover:-translate-y-2">
+              <div className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 h-full transition-all duration-500 hover:border-teal-500/50 active:border-teal-500/50 hover:shadow-2xl hover:shadow-teal-500/20 hover:-translate-y-2 active:shadow-lg">
                 {/* Glow effect en hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-cyan-500/0 group-hover:from-teal-500/5 group-hover:to-cyan-500/5 rounded-2xl transition-all duration-500"></div>
                 
@@ -151,14 +156,14 @@ export default function ProfessionalsSection() {
 
         {/* CTA opcional */}
         <motion.div 
-          className="mt-20 text-center"
+          className={`text-center ${isMobile ? 'mt-12' : 'mt-20'}`}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          <p className="text-slate-400 mb-6 text-lg">¿Quieres formar parte de nuestro equipo?</p>
-          <button className="px-10 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-900 font-bold rounded-full transition-all duration-300 shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-105 text-lg">
+          <p className={`text-slate-400 mb-6 ${isMobile ? 'text-base' : 'text-lg'}`}>¿Quieres formar parte de nuestro equipo?</p>
+          <button className={`bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 active:from-teal-400 active:to-cyan-400 text-slate-900 font-bold rounded-full transition-all duration-300 shadow-lg shadow-teal-500/30 hover:shadow-teal-500/50 hover:scale-105 ${isMobile ? 'w-full py-4 text-base' : 'px-10 py-4 text-lg'}`}>
             Contáctanos
           </button>
         </motion.div>
