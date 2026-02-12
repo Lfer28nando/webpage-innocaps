@@ -515,7 +515,6 @@ export default function ProcessSection() {
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-teal-500 rounded-full blur-[150px] animate-pulse" />
         <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-cyan-500 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
-      )}
 
       {/* Grid de fondo */}
       <div className="absolute inset-0 opacity-5">
