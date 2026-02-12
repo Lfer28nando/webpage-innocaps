@@ -1,16 +1,14 @@
 import { useRef, useCallback } from 'react';
 import SolutionsManifesto from './SolutionsManifesto';
 import SolutionsPillars from './SolutionsPillars';
-import TilvalosinaCaseStudy from './TilvalosinaCaseStudy';
 import ServiceModel from './ServiceModel';
 
 /* ═══════════════════════════════════════════
    SOLUTIONS PAGE — Main orchestrator
-   Assembles all 4 sections:
+   Assembles all sections:
     1. Manifesto (hero intro)
     2. 4 Pillars of Impact (interactive 3D)
-    3. Tilvalosina Case Study (trust signal)
-    4. Service Model (I+D as a Service)
+    3. Service Model (I+D as a Service)
    ═══════════════════════════════════════════ */
 
 export default function SolutionsPage() {
@@ -27,7 +25,6 @@ export default function SolutionsPage() {
     <div className="bg-slate-950 min-h-screen">
       <SolutionsManifesto onCTAClick={scrollToEcosistema} />
       <SolutionsPillars />
-      <TilvalosinaCaseStudy />
       <ServiceModel />
     </div>
   );
