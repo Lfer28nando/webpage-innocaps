@@ -150,7 +150,7 @@ export const impactSectors = [
     id: 1,
     sector: "Nutrición Animal",
     tagline: "Eficiencia Digestiva Revolucionaria",
-    description: "Desarrollamos aditivos nanoencapsulados que maximizan la absorción de nutrientes en alimentos balanceados. Probióticos protegidos, enzimas estables y metabolitos bioactivos que mejoran la salud intestinal y el rendimiento productivo del ganado.",
+    description: "Desarrollamos aditivos nanoencapsulados que maximizan la absorción de nutrientes en alimentos balanceados. Probióticos protegidos, enzimas estables y metabolitos bioactivos que mejoran la salud intestinal y el rendimiento productivo de diferentes especies.",
     benefits: [
       "Mayor tasa de conversión alimenticia",
       "Reducción de antibióticos promotores",
