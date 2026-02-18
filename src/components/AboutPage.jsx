@@ -1,59 +1,58 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 /* ═══════════════════════════════════════════════════════════════════
    CONSTANTS & DATA
    ═══════════════════════════════════════════════════════════════════ */
 
-const SCIENCE_CARDS = [
+const PHILOSOPHY_PILLARS = [
   {
-    id: 'zero-additives',
-    headline: 'El Residuo es el Producto.',
-    copy: 'Rompemos el paradigma tradicional. No purificamos el caldo de fermentación; lo integramos. Utilizamos el micelio y los exopolisacáridos (EPS) intrínsecos como matriz encapsulante natural, eliminando aditivos externos costosos.',
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10" aria-hidden="true">
-        <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="1.5" opacity="0.3" />
-        <path d="M16 32V20l8-8 8 8v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="24" cy="26" r="3" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-    ),
+    id: 'integral-use',
+    icon: '🌱',
+    headline: 'Aprovechamiento integral',
+    copy: 'Creemos en una ciencia eficiente y sostenible. Integramos matrices biológicas completas cuando es técnicamente viable, reduciendo procesos innecesarios y optimizando recursos. Trabajamos bajo el principio de que cada componente puede aportar funcionalidad si se entiende y se diseña correctamente.',
   },
   {
-    id: 'thermodrying',
-    headline: 'Vitrificación Controlada.',
-    copy: 'Dominamos el "Spray Drying" con precisión de milisegundos. Controlamos temperaturas de salida (50-65°C) para crear matrices vítreas que inmovilizan células vivas sin matarlas.',
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10" aria-hidden="true">
-        <rect x="14" y="8" width="20" height="32" rx="4" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M14 28h20" stroke="currentColor" strokeWidth="1.5" opacity="0.5" />
-        <circle cx="24" cy="34" r="3" fill="currentColor" opacity="0.4" />
-        <path d="M22 16v8M26 14v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
+    id: 'stability-engineering',
+    icon: '🔬',
+    headline: 'Ingeniería de estabilidad',
+    copy: 'Dominamos tecnologías como el secado por aspersión (spray drying) y la vitrificación controlada para generar matrices protectoras que preservan la viabilidad y funcionalidad de los activos sensibles.',
   },
   {
-    id: 'stability',
-    headline: 'Vehículos Blindados.',
-    copy: 'Desde Liposomas bicapa hasta Nanopartículas de Lípidos Sólidos (SLNs). Diseñamos la arquitectura exacta para proteger tu activo de la luz, el calor y el oxígeno.',
-    icon: (
-      <svg viewBox="0 0 48 48" fill="none" className="w-10 h-10" aria-hidden="true">
-        <path d="M24 4L6 14v12c0 10 8 16 18 18 10-2 18-8 18-18V14L24 4z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M18 24l4 4 8-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    id: 'molecular-architecture',
+    icon: '🧬',
+    headline: 'Arquitectura molecular a medida',
+    copy: 'Diseñamos sistemas como micelas, niosomas, dendrímeros, liposomas, nanopartículas lipídicas sólidas y matrices poliméricas según las propiedades fisicoquímicas del activo. Cada formulación responde a una estrategia: estabilidad, liberación controlada, biodisponibilidad o protección frente a condiciones ambientales.',
   },
 ];
 
-const TEAM_MEMBERS = [
-  {
-    id: 'elkin',
-    alias: 'El Visionario',
-    name: 'Elkin Dario Castellon',
-    role: 'Director Científico & Fundador',
-    credentials: 'PhD en Agroquímica. Químico y Magíster en Química Analítica. Experto en Sistemas Coloidales.',
-    photo: '/team/elkin.webp',
+const LAB_BIO_MODEL = {
+  lab: {
+    id: 'lab',
+    icon: '🔬',
+    title: 'InnoCaps Lab',
+    subtitle: 'Investigación',
+    copy: 'Es el corazón científico y creativo. Aquí investigamos, diseñamos y validamos sistemas de encapsulación. Generamos evidencia experimental, optimizamos formulaciones y construimos el soporte técnico que respalda cada desarrollo.',
   },
+  bio: {
+    id: 'bio',
+    icon: '🏭',
+    title: 'InnoCaps Bio',
+    subtitle: 'Industrial',
+    copy: 'Es la conexión con la industria. Transformamos el desarrollo de laboratorio en procesos escalables, robustos y reproducibles. Integramos ingeniería de proceso, control de calidad y acompañamiento en transferencia tecnológica para llevar el producto a nivel industrial.',
+  },
+};
+
+const TEAM_DIRECTOR = {
+  id: 'elkin',
+  name: 'Elkin Dario Castellón Castrillón',
+  role: 'Director Científico & Fundador',
+  credentials: 'PhD en Agroquímica. Químico y Magíster en Química Analítica. Especialista en sistemas coloidales y plataformas de encapsulación aplicadas.',
+  photo: '/team/elkin.webp',
+  intro: 'InnoCaps está liderado por una visión científica con enfoque práctico: desarrollar tecnología que funcione en condiciones reales de mercado.',
+};
+
+const ALLIES_MEMBERS = [
   {
     id: 'nathalia',
     alias: 'La Arquitecta de Materiales',
@@ -80,47 +79,20 @@ const TEAM_MEMBERS = [
   },
 ];
 
-const BUSINESS_POINTS = [
-  {
-    id: 'platform',
-    title: 'Plataforma, no Vendedor',
-    copy: 'Somos una plataforma B2B que conecta investigación, validación y escalado industrial. No solo vendemos un polvo; vendemos la certeza científica.',
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
-        <path d="M8 28l12-8 12 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M8 20l12-8 12 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-        <path d="M8 12l12-8 12 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" opacity="0.25" />
-      </svg>
-    ),
-  },
-  {
-    id: 'raas',
-    title: 'R&D as a Service',
-    copy: 'Ofrecemos modelos de suscripción para el desarrollo continuo de formulaciones. Tu producto evoluciona con nuestra ciencia.',
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
-        <path d="M6 30V14l14-8 14 8v16l-14 8z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M6 14l14 8 14-8" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
-        <path d="M20 22v16" stroke="currentColor" strokeWidth="1.5" opacity="0.4" />
-      </svg>
-    ),
-  },
-  {
-    id: 'validation',
-    title: 'Validación Visual',
-    copy: 'Rompemos la desconfianza con transparencia. Acceso a data experimental cruda y visualización de estabilidad en tiempo real.',
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8" aria-hidden="true">
-        <rect x="4" y="6" width="32" height="28" rx="3" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M10 26l6-8 5 4 9-12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="31" cy="12" r="2" fill="currentColor" opacity="0.6" />
-      </svg>
-    ),
-  },
+const PLATFORM_CONNECTIONS = [
+  'Investigación aplicada',
+  'Validación experimental',
+  'Desarrollo tecnológico',
+  'Escalado industrial',
+];
+
+const PLATFORM_OFFERS = [
+  'R&D como servicio con modelos de colaboración continua para el desarrollo y optimización de formulaciones.',
+  'Validación técnica transparente para acceso a datos experimentales, estudios de estabilidad y soporte técnico que respalde decisiones estratégicas.',
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
-   INTERSECTION OBSERVER HOOK — Fade-in on viewport entry
+   HOOKS
    ═══════════════════════════════════════════════════════════════════ */
 
 function useFadeIn(threshold = 0.15) {
@@ -141,7 +113,6 @@ function useFadeIn(threshold = 0.15) {
   return { ref, isVisible };
 }
 
-/* Wrapper that applies a simple CSS fade-in */
 function FadeInSection({ children, className = '', delay = 0 }) {
   const { ref, isVisible } = useFadeIn();
   return (
@@ -161,11 +132,10 @@ function FadeInSection({ children, className = '', delay = 0 }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   BLOCK 1: EL MANIFIESTO (Hero)
-   Pure black bg. Large text. Mouse distortion on desktop only.
+   BLOCK 1: HERO & MISSION
    ═══════════════════════════════════════════════════════════════════ */
 
-function HeroManifesto({ isMobile }) {
+function HeroSection({ isMobile }) {
   const containerRef = useRef(null);
   const [mouse, setMouse] = useState({ x: 0.5, y: 0.5 });
 
@@ -178,7 +148,6 @@ function HeroManifesto({ isMobile }) {
     });
   }, [isMobile]);
 
-  // Distortion offset for desktop
   const dx = (mouse.x - 0.5) * 6;
   const dy = (mouse.y - 0.5) * 4;
 
@@ -186,98 +155,90 @@ function HeroManifesto({ isMobile }) {
     <section
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full min-h-[100dvh] flex items-center justify-center bg-black overflow-hidden"
-      aria-label="Manifiesto InnoCaps"
+      className="relative w-full min-h-[100dvh] flex flex-col items-center justify-center bg-black overflow-hidden"
+      aria-label="InnoCaps: Ciencia que protege y transforma"
     >
       <div className="relative z-10 max-w-4xl mx-auto px-5 md:px-8 text-center">
+        {/* Eyebrow */}
+        <FadeInSection className="mb-6">
+          <p className="text-teal-400 text-xs md:text-sm font-mono tracking-widest uppercase">
+            Sobre Nosotros
+          </p>
+        </FadeInSection>
+
         {/* H1 */}
         <h1
           className="text-[clamp(2.2rem,7vw,5.5rem)] font-bold leading-[1.05] tracking-tight text-white mb-6"
           style={!isMobile ? { transform: `translate(${dx}px, ${dy}px)`, transition: 'transform 0.15s ease-out' } : undefined}
         >
-          La ciencia que{' '}
-          <span className="text-teal-400">protege</span>{' '}
-          lo que importa.
+          Ciencia que{' '}
+          <span className="text-teal-400">protege</span> y{' '}
+          <span className="text-teal-400">transforma</span>
         </h1>
 
-        {/* H2 */}
-        <h2
-          className="text-[clamp(1rem,2.5vw,1.5rem)] font-light text-slate-400 leading-relaxed max-w-2xl mx-auto mb-8"
-          style={!isMobile ? { transform: `translate(${dx * 0.5}px, ${dy * 0.5}px)`, transition: 'transform 0.2s ease-out' } : undefined}
-        >
-          Encapsulación inteligente. Cero aditivos. Ciencia de precisión para una industria que no puede permitirse fallar.
-        </h2>
+        {/* Mission */}
+        <FadeInSection delay={0.1} className="mb-12">
+          <p className="text-base md:text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed">
+            En InnoCaps diseñamos soluciones de micro y nanoencapsulación con enfoque científico, sostenible y escalable. Convertimos conocimiento en plataformas tecnológicas que protegen biomoléculas, optimizan su desempeño y facilitan su llegada al mercado.
+          </p>
+        </FadeInSection>
 
-        {/* Body */}
-        <p
-          className="text-base md:text-lg text-slate-500 max-w-xl mx-auto leading-relaxed"
-          style={!isMobile ? { transform: `translate(${dx * 0.3}px, ${dy * 0.3}px)`, transition: 'transform 0.25s ease-out' } : undefined}
-        >
-          Somos InnoCaps — el laboratorio que convierte residuos en plataformas de protección molecular.
-        </p>
+        {/* Key point */}
+        <FadeInSection delay={0.2} className="border-t border-slate-800/60 pt-8">
+          <p className="text-sm md:text-base text-slate-500 font-light italic">
+            No solo desarrollamos formulaciones. Desarrollamos soluciones con fundamento científico y visión de producto.
+          </p>
+        </FadeInSection>
       </div>
 
-      {/* Subtle gradient overlay at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-slate-950 to-transparent pointer-events-none" />
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   BLOCK 2: NUESTRA CIENCIA
-   Desktop: Interactive grid with hover. Mobile: CSS scroll-snap.
+   BLOCK 2: FILOSOFÍA CIENTÍFICA
    ═══════════════════════════════════════════════════════════════════ */
 
-function ScienceCard({ card, index, isMobile }) {
+function PhilosophyCard({ pillar, index, isMobile }) {
   return (
     <FadeInSection
       delay={isMobile ? 0 : index * 0.12}
-      className={
-        isMobile
-          ? 'nosotros-snap-card flex-shrink-0 w-[85vw] max-w-sm'
-          : ''
-      }
+      className={isMobile ? 'nosotros-snap-card flex-shrink-0 w-[85vw] max-w-sm' : ''}
     >
-      <div
-        className="group relative bg-slate-900/60 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-6 md:p-8 h-full transition-all duration-300 hover:border-teal-500/30 hover:bg-slate-900/80"
-        style={{ aspectRatio: isMobile ? '3/4' : undefined }}
-      >
+      <div className="group relative bg-slate-900/40 backdrop-blur-sm border border-slate-800/60 rounded-2xl p-6 md:p-8 h-full transition-all duration-300 hover:border-teal-500/30 hover:bg-slate-900/60">
         {/* Icon */}
-        <div className="text-teal-400 mb-5">{card.icon}</div>
+        <div className="text-3xl mb-4">{pillar.icon}</div>
 
         {/* Headline */}
         <h3 className="text-xl md:text-2xl font-bold text-white mb-3 leading-tight">
-          {card.headline}
+          {pillar.headline}
         </h3>
 
         {/* Copy */}
         <p className="text-sm md:text-base text-slate-400 leading-relaxed">
-          {card.copy}
+          {pillar.copy}
         </p>
 
-        {/* Hover glow (desktop only) */}
         <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-br from-teal-500/5 to-transparent" />
       </div>
     </FadeInSection>
   );
 }
 
-function ScienceSection({ isMobile }) {
+function PhilosophySection({ isMobile }) {
   return (
-    <section className="relative py-20 md:py-32 bg-slate-950" aria-labelledby="ciencia-title">
+    <section className="relative py-20 md:py-32 bg-slate-950" aria-labelledby="filosofia-title">
       <div className="max-w-6xl mx-auto px-5 md:px-8">
-        {/* Title */}
         <FadeInSection className="mb-12 md:mb-16">
           <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Filosofía</p>
-          <h2 id="ciencia-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
-            Nuestra Ciencia:<br />
-            <span className="text-teal-400">Cero Desperdicio.</span>
+          <h2 id="filosofia-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
+            Ciencia aplicada con{' '}
+            <span className="text-teal-400">propósito</span>
           </h2>
         </FadeInSection>
 
-        {/* Cards */}
         {isMobile ? (
-          /* ── MOBILE: CSS Scroll-Snap ── */
           <div
             className="flex gap-4 overflow-x-auto pb-4 -mx-5 px-5"
             style={{
@@ -286,17 +247,15 @@ function ScienceSection({ isMobile }) {
               scrollbarWidth: 'none',
             }}
           >
-            {SCIENCE_CARDS.map((card, i) => (
-              <ScienceCard key={card.id} card={card} index={i} isMobile={true} />
+            {PHILOSOPHY_PILLARS.map((pillar, i) => (
+              <PhilosophyCard key={pillar.id} pillar={pillar} index={i} isMobile={true} />
             ))}
-            {/* Spacer for last card peek */}
             <div className="flex-shrink-0 w-4" aria-hidden="true" />
           </div>
         ) : (
-          /* ── DESKTOP: Interactive Grid ── */
           <div className="grid grid-cols-3 gap-6">
-            {SCIENCE_CARDS.map((card, i) => (
-              <ScienceCard key={card.id} card={card} index={i} isMobile={false} />
+            {PHILOSOPHY_PILLARS.map((pillar, i) => (
+              <PhilosophyCard key={pillar.id} pillar={pillar} index={i} isMobile={false} />
             ))}
           </div>
         )}
@@ -306,23 +265,150 @@ function ScienceSection({ isMobile }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   BLOCK 3: EL EQUIPO — Authority Trust
-   Desktop: Horizontal layout. Mobile: Vertical list + accordion.
+   BLOCK 3: NUESTRO MODELO — LAB + BIO (DUALIDAD)
+   Split Screen (Desktop) | Vertical Stack (Mobile)
    ═══════════════════════════════════════════════════════════════════ */
 
-function TeamMember({ member, isMobile, index }) {
+function LabBioCard({ model, isMobile, isLab }) {
+  return (
+    <FadeInSection delay={isMobile ? 0 : (isLab ? 0 : 0.15)}>
+      <div className="relative bg-slate-900/50 border border-slate-800/60 rounded-2xl p-8 md:p-10 h-full">
+        <div className="flex items-start gap-4 mb-6">
+          <span className="text-4xl md:text-5xl">{model.icon}</span>
+          <div>
+            <p className="text-xs md:text-sm font-mono tracking-widest uppercase text-teal-400 mb-1">
+              {model.subtitle}
+            </p>
+            <h3 className="text-2xl md:text-3xl font-bold text-white">{model.title}</h3>
+          </div>
+        </div>
+        <p className="text-sm md:text-base text-slate-400 leading-relaxed">
+          {model.copy}
+        </p>
+      </div>
+    </FadeInSection>
+  );
+}
+
+function LabBioSection({ isMobile }) {
+  return (
+    <section className="relative py-20 md:py-32 bg-black" aria-labelledby="modelo-title">
+      <div className="max-w-6xl mx-auto px-5 md:px-8">
+        {/* Title */}
+        <FadeInSection className="mb-16">
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Modelo</p>
+          <h2 id="modelo-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
+            Nuestro Modelo:
+            <br />
+            <span className="text-teal-400">Lab + Bio</span>
+          </h2>
+        </FadeInSection>
+
+        {/* Lab + Bio Cards */}
+        {isMobile ? (
+          <div className="space-y-6">
+            <LabBioCard model={LAB_BIO_MODEL.lab} isMobile={true} isLab={true} />
+            <LabBioCard model={LAB_BIO_MODEL.bio} isMobile={true} isLab={false} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-8 mb-12">
+            <LabBioCard model={LAB_BIO_MODEL.lab} isMobile={false} isLab={true} />
+            <LabBioCard model={LAB_BIO_MODEL.bio} isMobile={false} isLab={false} />
+          </div>
+        )}
+
+        {/* Integration message */}
+        <FadeInSection delay={isMobile ? 0 : 0.3} className="mt-12 text-center">
+          <p className="text-teal-400 font-bold text-lg md:text-xl mb-2">
+            Lab crea. Bio escala.
+          </p>
+          <p className="text-slate-400 text-base md:text-lg">
+            Juntos convertimos ciencia en producto.
+          </p>
+        </FadeInSection>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BLOCK 4: NUESTRO EQUIPO (Solo Director)
+   ═══════════════════════════════════════════════════════════════════ */
+
+function DirectorCard({ isMobile }) {
+  return (
+    <FadeInSection className="max-w-md mx-auto">
+      <div className="group relative bg-slate-900/40 border border-slate-800/50 rounded-2xl overflow-hidden transition-all duration-300 hover:border-teal-500/30">
+        {/* Photo with priority LCP */}
+        <div className="aspect-[3/4] overflow-hidden bg-slate-800">
+          <img
+            src={TEAM_DIRECTOR.photo}
+            alt={TEAM_DIRECTOR.name}
+            width="400"
+            height="533"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            className="w-full h-full object-cover grayscale contrast-125 transition-all duration-500 group-hover:grayscale-0"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        </div>
+
+        {/* Info */}
+        <div className="p-6 md:p-8">
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+            {TEAM_DIRECTOR.name}
+          </h3>
+          <p className="text-teal-400 text-sm font-mono tracking-wider uppercase mb-3">
+            {TEAM_DIRECTOR.role}
+          </p>
+          <p className="text-slate-400 text-sm leading-relaxed mb-4">
+            {TEAM_DIRECTOR.credentials}
+          </p>
+          <div className="border-t border-slate-800/60 pt-4">
+            <p className="text-slate-500 text-sm italic">
+              {TEAM_DIRECTOR.intro}
+            </p>
+          </div>
+        </div>
+      </div>
+    </FadeInSection>
+  );
+}
+
+function TeamSection({ isMobile }) {
+  return (
+    <section className="relative py-20 md:py-32 bg-slate-950" aria-labelledby="equipo-title">
+      <div className="max-w-6xl mx-auto px-5 md:px-8">
+        <FadeInSection className="mb-12 md:mb-16">
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Equipo</p>
+          <h2 id="equipo-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
+            Ciencia hecha por <span className="text-teal-400">científicos</span>
+          </h2>
+        </FadeInSection>
+
+        <DirectorCard isMobile={isMobile} />
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BLOCK 5: ALIADOS ESTRATÉGICOS
+   ═══════════════════════════════════════════════════════════════════ */
+
+function AllyMember({ member, isMobile, index }) {
   const [expanded, setExpanded] = useState(false);
 
   if (isMobile) {
     return (
-      <FadeInSection delay={index * 0.08}>
+      <FadeInSection delay={index * 0.06}>
         <button
           onClick={() => setExpanded(!expanded)}
           className="w-full flex items-center gap-4 py-4 border-b border-slate-800/60 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 rounded-lg"
           aria-expanded={expanded}
         >
-          {/* Photo */}
-          <div className="flex-shrink-0 w-14 h-14 rounded-full overflow-hidden bg-slate-800" style={{ aspectRatio: '1/1' }}>
+          <div className="flex-shrink-0 w-14 h-14 rounded-full overflow-hidden bg-slate-800">
             <img
               src={member.photo}
               alt={member.name}
@@ -334,14 +420,10 @@ function TeamMember({ member, isMobile, index }) {
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
           </div>
-
-          {/* Name & role */}
           <div className="flex-1 min-w-0">
             <p className="text-white font-semibold text-sm truncate">{member.name}</p>
             <p className="text-teal-400 text-xs">{member.alias}</p>
           </div>
-
-          {/* Chevron */}
           <svg
             className={`w-5 h-5 text-slate-500 transition-transform duration-200 flex-shrink-0 ${expanded ? 'rotate-180' : ''}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
@@ -349,8 +431,6 @@ function TeamMember({ member, isMobile, index }) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
         </button>
-
-        {/* Accordion content */}
         <div
           className="overflow-hidden transition-all duration-300"
           style={{ maxHeight: expanded ? '200px' : '0', opacity: expanded ? 1 : 0 }}
@@ -364,59 +444,54 @@ function TeamMember({ member, isMobile, index }) {
     );
   }
 
-  // Desktop card
   return (
-    <FadeInSection delay={index * 0.12}>
+    <FadeInSection delay={index * 0.1}>
       <div className="group relative bg-slate-900/40 border border-slate-800/50 rounded-2xl overflow-hidden transition-all duration-300 hover:border-teal-500/30">
-        {/* Photo */}
         <div className="aspect-[3/4] overflow-hidden bg-slate-800">
           <img
             src={member.photo}
             alt={member.name}
-            width="400"
-            height="533"
+            width="300"
+            height="400"
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
             onError={(e) => { e.currentTarget.style.display = 'none'; }}
           />
         </div>
-
-        {/* Info */}
-        <div className="p-5">
+        <div className="p-4">
           <p className="text-teal-400 text-xs font-mono tracking-wider uppercase mb-1">{member.alias}</p>
-          <h3 className="text-lg font-bold text-white mb-1">{member.name}</h3>
+          <h3 className="text-base font-bold text-white mb-1">{member.name}</h3>
           <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">{member.role}</p>
-          <p className="text-slate-400 text-sm leading-relaxed">{member.credentials}</p>
+          <p className="text-slate-400 text-xs leading-relaxed">{member.credentials}</p>
         </div>
       </div>
     </FadeInSection>
   );
 }
 
-function TeamSection({ isMobile }) {
+function AlliesSection({ isMobile }) {
   return (
-    <section className="relative py-20 md:py-32 bg-black" aria-labelledby="equipo-title">
+    <section className="relative py-20 md:py-32 bg-black" aria-labelledby="aliados-title">
       <div className="max-w-6xl mx-auto px-5 md:px-8">
-        {/* Title */}
         <FadeInSection className="mb-12 md:mb-16">
-          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Equipo</p>
-          <h2 id="equipo-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
-            Ciencia hecha por{' '}
-            <span className="text-teal-400">científicos.</span>
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Colaboradores</p>
+          <h2 id="aliados-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
+            Aliados Estratégicos y{' '}
+            <span className="text-teal-400">Colaboradores</span>
           </h2>
         </FadeInSection>
 
         {isMobile ? (
           <div className="space-y-0">
-            {TEAM_MEMBERS.map((m, i) => (
-              <TeamMember key={m.id} member={m} isMobile={true} index={i} />
+            {ALLIES_MEMBERS.map((m, i) => (
+              <AllyMember key={m.id} member={m} isMobile={true} index={i} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-6">
-            {TEAM_MEMBERS.map((m, i) => (
-              <TeamMember key={m.id} member={m} isMobile={false} index={i} />
+          <div className="grid grid-cols-3 gap-6">
+            {ALLIES_MEMBERS.map((m, i) => (
+              <AllyMember key={m.id} member={m} isMobile={false} index={i} />
             ))}
           </div>
         )}
@@ -426,62 +501,78 @@ function TeamSection({ isMobile }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   BLOCK 4: MODELO DE NEGOCIO — La Disrupción
+   BLOCK 6: PLATAFORMA B2B
    ═══════════════════════════════════════════════════════════════════ */
 
-function BusinessSection({ isMobile }) {
+function PlatformSection({ isMobile }) {
   return (
-    <section className="relative py-20 md:py-32 bg-slate-950" aria-labelledby="modelo-title">
-      <div className="max-w-5xl mx-auto px-5 md:px-8">
-        {/* Title */}
-        <FadeInSection className="mb-14 md:mb-20 text-center">
-          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Modelo</p>
-          <h2 id="modelo-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
-            No vendemos productos.<br />
-            <span className="text-teal-400">Vendemos certeza.</span>
+    <section className="relative py-20 md:py-32 bg-slate-950" aria-labelledby="plataforma-title">
+      <div className="max-w-4xl mx-auto px-5 md:px-8">
+        <FadeInSection className="mb-12 md:mb-16">
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">Modelo B2B</p>
+          <h2 id="plataforma-title" className="text-3xl md:text-5xl font-bold text-white leading-tight">
+            Plataforma B2B de{' '}
+            <span className="text-teal-400">I+D+i</span>
           </h2>
         </FadeInSection>
 
-        {/* Points */}
-        <div className={`grid gap-8 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
-          {BUSINESS_POINTS.map((point, i) => (
-            <FadeInSection key={point.id} delay={isMobile ? 0 : i * 0.12}>
-              <div className="flex flex-col items-start gap-4 p-6 md:p-0">
-                {/* Icon */}
-                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                  {point.icon}
-                </div>
-
-                {/* Title */}
-                <h3 className="text-lg md:text-xl font-bold text-white">{point.title}</h3>
-
-                {/* Copy */}
-                <p className="text-sm md:text-base text-slate-400 leading-relaxed">{point.copy}</p>
+        {/* Connections */}
+        <FadeInSection delay={0.1} className="mb-12">
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-6">Conectamos</p>
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+            {PLATFORM_CONNECTIONS.map((connection, i) => (
+              <div key={i} className="flex items-start gap-3">
+                <span className="text-teal-400 font-bold mt-1">→</span>
+                <p className="text-slate-300 text-base md:text-lg md:text-lg">{connection}</p>
               </div>
-            </FadeInSection>
-          ))}
-        </div>
+            ))}
+          </div>
+        </FadeInSection>
+
+        {/* Divider */}
+        <div className="border-t border-slate-800/60 my-12" />
+
+        {/* Offers */}
+        <FadeInSection delay={0.15}>
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-6">Ofrecemos</p>
+          <div className="space-y-5">
+            {PLATFORM_OFFERS.map((offer, i) => (
+              <div key={i} className="flex items-start gap-4">
+                <span className="text-teal-500 font-bold text-xl mt-1 flex-shrink-0">✓</span>
+                <p className="text-slate-400 text-base leading-relaxed">{offer}</p>
+              </div>
+            ))}
+          </div>
+        </FadeInSection>
+
+        {/* Key message */}
+        <FadeInSection delay={0.2} className="mt-12 p-6 md:p-8 border border-slate-800/60 rounded-2xl bg-slate-900/30 backdrop-blur-sm">
+          <p className="text-white text-center text-base md:text-lg leading-relaxed">
+            No vendemos únicamente un ingrediente encapsulado.
+            <br />
+            <span className="text-teal-400 font-bold">Ofrecemos certeza técnica, respaldo científico y acompañamiento estratégico.</span>
+          </p>
+        </FadeInSection>
       </div>
     </section>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   BLOCK 5: CALL TO ACTION (Footer)
-   Minimal. Pure.
+   BLOCK 7: CTA FOOTER
    ═══════════════════════════════════════════════════════════════════ */
 
-function CTAFooter({ isMobile }) {
+function CTASection({ isMobile }) {
   return (
-    <section className="relative py-24 md:py-40 bg-black" aria-label="Contacto">
+    <section className="relative py-24 md:py-40 bg-black" aria-label="Llamada a acción final">
       <div className="max-w-3xl mx-auto px-5 md:px-8 text-center">
         <FadeInSection>
           <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4">
-            ¿Listo para encapsular{' '}
-            <span className="text-teal-400">el futuro</span>?
+            ¿Listos para desarrollar el{' '}
+            <span className="text-teal-400">siguiente nivel</span> de tu producto?
           </h2>
-          <p className="text-base md:text-lg text-slate-400 mb-10 max-w-lg mx-auto">
-            Hablemos de cómo nuestra ciencia puede transformar tu producto.
+          <p className="text-base md:text-lg text-slate-400 mb-10 max-w-xl mx-auto leading-relaxed">
+            Hablemos de cómo nuestra plataforma Lab + Bio puede transformar tu proyecto en una solución validada y escalable.
           </p>
           <a
             href="/contacto"
@@ -500,7 +591,7 @@ function CTAFooter({ isMobile }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   MAIN EXPORT — AboutPage
+   MAIN EXPORT
    ═══════════════════════════════════════════════════════════════════ */
 
 export default function AboutPage() {
@@ -508,11 +599,13 @@ export default function AboutPage() {
 
   return (
     <main>
-      <HeroManifesto isMobile={isMobile} />
-      <ScienceSection isMobile={isMobile} />
+      <HeroSection isMobile={isMobile} />
+      <PhilosophySection isMobile={isMobile} />
+      <LabBioSection isMobile={isMobile} />
       <TeamSection isMobile={isMobile} />
-      <BusinessSection isMobile={isMobile} />
-      <CTAFooter isMobile={isMobile} />
+      <AlliesSection isMobile={isMobile} />
+      <PlatformSection isMobile={isMobile} />
+      <CTASection isMobile={isMobile} />
     </main>
   );
 }

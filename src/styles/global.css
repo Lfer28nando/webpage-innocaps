@@ -250,6 +250,7 @@
 
 /* ─────────────────────────────────────────────
    ABOUT PAGE — Scroll-Snap Carousel (Mobile)
+   Mobile Stack & LCP Optimization
    ───────────────────────────────────────────── */
 
 .nosotros-snap-card {
@@ -260,6 +261,33 @@
 @media (max-width: 768px) {
   .nosotros-snap-card::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* Director image — priority LCP */
+.director-image {
+  content-visibility: auto;
+}
+
+/* Optimize Lab/Bio stack on mobile */
+@media (max-width: 768px) {
+  [class*="lab-bio"] {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  [class*="lab-bio"] > div {
+    order: 1;
+  }
+  
+  /* Lab section appears first */
+  [class*="lab-bio"] > div:first-child {
+    order: 1;
+  }
+  
+  /* Bio section appears second */
+  [class*="lab-bio"] > div:last-child {
+    order: 2;
   }
 }
 

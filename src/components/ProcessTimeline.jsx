@@ -11,17 +11,16 @@ const STEPS = [
     id: '01',
     title: 'DECONSTRUCCIÓN DEL RETO',
     tagline: 'Diagnóstico Molecular',
-    copy: 'Todo comienza analizando la fragilidad de tu activo. ¿Es sensible al pH del estómago? ¿Se oxida con la luz? Definimos el "Dolor Biológico" y seleccionamos la arquitectura de encapsulación ideal.',
-    highlights: ['Liposoma', 'Niosoma', 'SLN'],
+    copy: 'Todo comienza analizando las propiedades fisicoquímicas y la fragilidad de tu activo. ¿Es sensible al pH? ¿Se oxida con la luz? Definimos el "Dolor Biológico" y seleccionamos la arquitectura de encapsulación ideal.',
+    highlights: ['Micelas', 'Liposoma', 'Niosoma', 'SLN', 'Dendrímeros', 'Ciclodextrinas'],
     visual: 'diagnose',
   },
   {
     id: '02',
     title: 'DISEÑO "ZERO-WASTE"',
     tagline: 'Arquitectura de Matriz',
-    copy: 'Rompemos el estándar de la industria. En lugar de añadir polímeros sintéticos costosos, evaluamos el uso de matrices intrínsecas para maximizar tus recursos.',
+    copy: 'Rompemos el estándar de la industria. En lugar de añadir polímeros sintéticos no viables, evaluamos el uso de matrices intrínsecas para maximizar tus recursos.',
     bullets: [
-      { label: 'Vía Fúngica', detail: 'Usamos el micelio y exopolisacáridos del propio caldo fermentado como escudo.' },
       { label: 'Vía Bacteriana', detail: 'Inducimos el auto-ensamblaje de biosurfactantes.' },
     ],
     quote: 'Maximizamos tus recursos convirtiendo el medio de cultivo en parte de la solución.',
@@ -31,24 +30,23 @@ const STEPS = [
     id: '03',
     title: 'FORJA NANOMÉTRICA',
     tagline: 'Síntesis de Alta Presión',
-    copy: 'Llevamos la formulación al límite físico para garantizar estabilidad.',
+    copy: 'Trabajamos la formulación considerando sus variables termodinámicas llegando al límite físico para garantizar estabilidad.',
     bullets: [
-      { label: 'Homogeneización (HPH)', detail: 'Sometemos la mezcla a 500 – 1500 bar de presión. Esto fusiona los lípidos sólidos y líquidos a nivel molecular, creando estructuras ordenadas imposibles de separar.' },
-      { label: 'Resultado', detail: 'Nanoemulsiones termodinámicamente estables de 20-200 nm.' },
+      { label: 'Homogeneización', detail: 'Sometemos la mezcla a diferentes procesos de homogeneización, garantizando el proceso de escalado. Consecuentemente, se crean estructuras ordenadas, estables y perfectas para su función específica.' },
+      { label: 'Resultado', detail: 'Nano o microemulsiones termodinámicamente estables de 20-900 nm.' },
     ],
-    dataHighlights: ['500 – 1500 bar', '20-200 nm'],
+    dataHighlights: ['20-900 nm'],
     visual: 'pressure',
   },
   {
     id: '04',
     title: 'EL "PUNTO DULCE" TÉRMICO',
     tagline: 'Vitrificación Térmica',
-    copy: 'El momento crítico. Convertimos líquidos vivos en polvos estables mediante Spray Drying de Precisión.',
+    copy: 'El momento crítico. Convertimos prebióticos, probióticos y posbióticos en polvos estables mediante procesos de secado de precisión.',
     bullets: [
-      { label: 'Temperatura de Salida', detail: 'Controlada entre 50-65°C.' },
-      { label: 'Vitrificación', detail: 'Logramos un estado vítreo de la matriz sin desnaturalizar proteínas ni matar microorganismos probióticos (>10⁹ UFC/g garantizados).' },
+      { label: 'Vitrificación', detail: 'Logramos un estado vítreo de la matriz sin desnaturalizar proteínas ni eliminar la viabilidad biológica de microorganismos probióticos.' },
     ],
-    dataHighlights: ['50-65°C', '>10⁹ UFC/g'],
+    dataHighlights: ['Vitrificación térmica'],
     visual: 'drying',
   },
   {
@@ -57,8 +55,8 @@ const STEPS = [
     tagline: 'Validación & Escalado',
     copy: 'La ciencia no es una promesa, es un dato.',
     bullets: [
-      { label: 'Visualización Científica', detail: 'Verás tu producto bajo microscopio y pruebas de estrés acelerado.' },
-      { label: 'R&D as a Service', detail: 'Tu fórmula queda lista para producción industrial masiva o para evolucionar mediante nuestro modelo de suscripción de I+D.' },
+      { label: 'Visualización Científica', detail: 'Se proporcionan imágenes y datos que prueben las características del producto final.' },
+      { label: 'Resultado', detail: 'Tu fórmula queda lista para producción industrial masiva o para evolucionar mediante nuestro modelo de suscripción de I+D.' },
     ],
     visual: 'validate',
   },
@@ -471,16 +469,16 @@ export default function ProcessTimeline() {
       {/* ── HEADER ── */}
       <div className="max-w-4xl mx-auto px-5 md:px-8 text-center mb-16 md:mb-24">
         <FadeIn>
-          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">The Molecular Journey</p>
+          <p className="text-teal-400 text-sm font-mono tracking-widest uppercase mb-3">El Viaje Molecular</p>
           <h2 id="process-title" className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-5">
             EL MÉTODO{' '}
             <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">INNOCAPS</span>.
           </h2>
           <p className="text-lg md:text-xl text-slate-400 max-w-xl mx-auto mb-4 font-light">
-            No adivinamos. Diseñamos, estresamos y validamos.
+            Diseñamos, ejecutamos y validamos.
           </p>
           <p className="text-sm md:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed">
-            Transformar una idea en un ingrediente funcional requiere más que mezcla; requiere ingeniería termodinámica. Este es nuestro protocolo de co-creación científica.
+            Transformar una idea en un ingrediente funcional requiere más que mezcla; requiere ingeniería de precisión. Este es nuestro protocolo de co-creación científica.
           </p>
         </FadeIn>
       </div>
