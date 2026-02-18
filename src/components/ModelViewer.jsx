@@ -1,5 +1,5 @@
-import { useRef, useState, useEffect, Suspense, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useState, useEffect, Suspense, useMemo, useCallback } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, OrbitControls, Float, Center } from '@react-three/drei';
 
 /* ═══════════════════════════════════════════════════════════════
@@ -29,9 +29,6 @@ const MODEL_PATHS = {
 
 const DEVICE_TIER = getDeviceTier();
 const MODEL_PATH  = MODEL_PATHS[DEVICE_TIER];
-
-/* Pre-descarga inmediata del modelo correcto */
-useGLTF.preload(MODEL_PATH);
 
 /* ═══════════════════════════════════════════════════════════════
    Modelo 3D — con control de framerate adaptativo
@@ -133,19 +130,18 @@ export default function ModelViewer() {
     antialias: DEVICE_TIER !== 'low',
   }), []);
 
-  /* Progreso simulado */
+  /* Progreso simulado — throttled to reduce re-renders */
   useEffect(() => {
     if (loaded) return;
-    let raf;
     let current = 0;
-    const tick = () => {
-      const target = loaded ? 100 : 85;
-      current += (target - current) * 0.04;
-      setProgress(Math.min(Math.round(current), 99));
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const interval = setInterval(() => {
+      const target = 85;
+      current += (target - current) * 0.08;
+      const rounded = Math.min(Math.round(current), 99);
+      setProgress(rounded);
+      if (rounded >= 99) clearInterval(interval);
+    }, 100); // 10fps instead of 60fps
+    return () => clearInterval(interval);
   }, [loaded]);
 
   const handleLoaded = () => {
@@ -172,7 +168,6 @@ export default function ModelViewer() {
           gl.setClearColor(0x000000, 0);
           scene.background = null;
         }}
-        /* frameloop demand: solo renderiza cuando hay cambio */
         frameloop="always"
         className="bg-transparent"
       >

@@ -1,8 +1,21 @@
+import { lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
-import NanoArsenal from './NanoArsenal';
-import BiotechDeepDive from './BiotechDeepDive';
-import SprayDryingSection from './SprayDryingSection';
-import DisruptiveInnovation from './DisruptiveInnovation';
+import { useIsMobile } from '../hooks/useIsMobile';
+
+/* Lazy-load heavy 3D/animation sections — only downloaded when scrolled near */
+const NanoArsenal = lazy(() => import('./NanoArsenal'));
+const BiotechDeepDive = lazy(() => import('./BiotechDeepDive'));
+const SprayDryingSection = lazy(() => import('./SprayDryingSection'));
+const DisruptiveInnovation = lazy(() => import('./DisruptiveInnovation'));
+
+/* Minimal loading placeholder */
+function SectionFallback() {
+  return (
+    <div className="flex items-center justify-center py-32">
+      <span className="text-[10px] font-mono text-slate-600 tracking-[0.25em] uppercase animate-pulse">cargando sección</span>
+    </div>
+  );
+}
 
 /* ──────────────────────────────
    Animación helpers
@@ -23,27 +36,36 @@ const stagger = (delay = 0) => ({
    HERO
    ────────────────────────────── */
 function TechHero() {
+  const isMobile = useIsMobile();
+  const particleCount = isMobile ? 0 : 6;
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-slate-950 pt-32 pb-20">
       {/* Radial gradient background */}
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-teal-500/10 rounded-full blur-[180px]" />
-        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/8 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 left-1/3 w-[350px] h-[350px] bg-blue-500/8 rounded-full blur-[120px]" />
+        {!isMobile && (
+          <>
+            <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/8 rounded-full blur-[120px]" />
+            <div className="absolute bottom-1/4 left-1/3 w-[350px] h-[350px] bg-blue-500/8 rounded-full blur-[120px]" />
+          </>
+        )}
       </div>
 
       {/* Grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(20,184,166,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.4) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
+      {!isMobile && (
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(20,184,166,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.4) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
+      )}
 
-      {/* Floating particles */}
-      {[...Array(6)].map((_, i) => (
+      {/* Floating particles — desktop only */}
+      {[...Array(particleCount)].map((_, i) => (
         <motion.div
           key={`particle-${i}`}
           className="absolute w-1 h-1 bg-teal-400 rounded-full"
@@ -119,10 +141,18 @@ export default function TechnologyPage() {
   return (
     <div className="bg-slate-950 min-h-screen">
       <TechHero />
-      <NanoArsenal />
-      <BiotechDeepDive />
-      <SprayDryingSection />
-      <DisruptiveInnovation />
+      <Suspense fallback={<SectionFallback />}>
+        <NanoArsenal />
+      </Suspense>
+      <Suspense fallback={<SectionFallback />}>
+        <BiotechDeepDive />
+      </Suspense>
+      <Suspense fallback={<SectionFallback />}>
+        <SprayDryingSection />
+      </Suspense>
+      <Suspense fallback={<SectionFallback />}>
+        <DisruptiveInnovation />
+      </Suspense>
     </div>
   );
 }

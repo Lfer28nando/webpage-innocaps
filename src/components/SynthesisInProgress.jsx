@@ -1,6 +1,8 @@
-import { useRef, useMemo, useEffect, useState } from 'react';
+import { useRef, useMemo, useEffect, useState, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Canvas, useFrame } from '@react-three/fiber';
+
+// Lazy-load the entire R3F Canvas tree — avoids loading Three.js until needed
+const LazyParticleCanvas = lazy(() => import('./SynthesisCanvas.jsx'));
 
 /* ─────────────────────────────────────────────
    COPY VARIATIONS (Nanotechnology tone)
@@ -31,130 +33,15 @@ const COPY_VARIANTS = [
 ];
 
 /* ─────────────────────────────────────────────
-   THREE.JS  —  Particle Molecule Sphere
-   ───────────────────────────────────────────── */
-
-function ParticleSphere() {
-  const meshRef = useRef();
-  const linesRef = useRef();
-
-  const PARTICLE_COUNT = 180;
-
-  // Generate icosphere-ish positions
-  const { positions, basePositions } = useMemo(() => {
-    const pos = new Float32Array(PARTICLE_COUNT * 3);
-    const base = new Float32Array(PARTICLE_COUNT * 3);
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const phi = Math.acos(-1 + (2 * i) / PARTICLE_COUNT);
-      const theta = Math.sqrt(PARTICLE_COUNT * Math.PI) * phi;
-      const r = 1.6;
-      const x = r * Math.cos(theta) * Math.sin(phi);
-      const y = r * Math.sin(theta) * Math.sin(phi);
-      const z = r * Math.cos(phi);
-      pos[i * 3] = x;
-      pos[i * 3 + 1] = y;
-      pos[i * 3 + 2] = z;
-      base[i * 3] = x;
-      base[i * 3 + 1] = y;
-      base[i * 3 + 2] = z;
-    }
-    return { positions: pos, basePositions: base };
-  }, []);
-
-  // Determine connections (lines between close particles)
-  const linePositions = useMemo(() => {
-    const lines = [];
-    const threshold = 0.8;
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      for (let j = i + 1; j < PARTICLE_COUNT; j++) {
-        const dx = positions[i * 3] - positions[j * 3];
-        const dy = positions[i * 3 + 1] - positions[j * 3 + 1];
-        const dz = positions[i * 3 + 2] - positions[j * 3 + 2];
-        if (Math.sqrt(dx * dx + dy * dy + dz * dz) < threshold) {
-          lines.push(
-            positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2],
-            positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2],
-          );
-        }
-      }
-    }
-    return new Float32Array(lines);
-  }, [positions]);
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (meshRef.current) {
-      const posArr = meshRef.current.geometry.attributes.position.array;
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const bx = basePositions[i * 3];
-        const by = basePositions[i * 3 + 1];
-        const bz = basePositions[i * 3 + 2];
-        const wobble = Math.sin(t * 1.2 + i * 0.3) * 0.08;
-        const pulse = 1 + Math.sin(t * 0.5) * 0.06;
-        posArr[i * 3] = (bx + wobble) * pulse;
-        posArr[i * 3 + 1] = (by + wobble * 0.7) * pulse;
-        posArr[i * 3 + 2] = (bz + wobble * 0.5) * pulse;
-      }
-      meshRef.current.geometry.attributes.position.needsUpdate = true;
-      meshRef.current.rotation.y = t * 0.15;
-      meshRef.current.rotation.x = Math.sin(t * 0.08) * 0.3;
-    }
-    if (linesRef.current) {
-      linesRef.current.rotation.y = t * 0.15;
-      linesRef.current.rotation.x = Math.sin(t * 0.08) * 0.3;
-    }
-  });
-
-  return (
-    <group>
-      {/* Particles */}
-      <points ref={meshRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[positions, 3]}
-            count={PARTICLE_COUNT}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.04}
-          color="#22d3ee"
-          transparent
-          opacity={0.9}
-          sizeAttenuation
-          depthWrite={false}
-        />
-      </points>
-
-      {/* Connection Lines */}
-      <lineSegments ref={linesRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[linePositions, 3]}
-            count={linePositions.length / 3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color="#22d3ee" transparent opacity={0.15} />
-      </lineSegments>
-
-      {/* Inner glow sphere */}
-      <mesh>
-        <sphereGeometry args={[0.5, 32, 32]} />
-        <meshBasicMaterial color="#22d3ee" transparent opacity={0.04} />
-      </mesh>
-    </group>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   CANVAS BACKGROUND  —  Neural Network Grid
+   CANVAS BACKGROUND  —  Neural Network Grid (optimized)
+   Reduced particles, pauses off-screen via IntersectionObserver
    ───────────────────────────────────────────── */
 
 function NeuralBackground() {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const animRef = useRef(null);
+  const isVisibleRef = useRef(true);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -163,10 +50,10 @@ function NeuralBackground() {
     let w = (canvas.width = window.innerWidth);
     let h = (canvas.height = window.innerHeight);
 
-    const PARTICLE_N = Math.min(80, Math.floor((w * h) / 15000));
-    const CONNECTION_DIST = 160;
+    // Reduced particle count by ~40%
+    const PARTICLE_N = Math.min(50, Math.floor((w * h) / 25000));
+    const CONNECTION_DIST = 140;
 
-    // Initialise particles
     particlesRef.current = Array.from({ length: PARTICLE_N }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
@@ -181,11 +68,20 @@ function NeuralBackground() {
     };
     window.addEventListener('resize', onResize);
 
+    // Pause when off-screen
+    const observer = new IntersectionObserver(
+      ([entry]) => { isVisibleRef.current = entry.isIntersecting; },
+      { threshold: 0.1 }
+    );
+    observer.observe(canvas);
+
     const draw = () => {
+      animRef.current = requestAnimationFrame(draw);
+      if (!isVisibleRef.current) return;
+
       ctx.clearRect(0, 0, w, h);
       const pts = particlesRef.current;
 
-      // Update
       for (const p of pts) {
         p.x += p.vx;
         p.y += p.vy;
@@ -193,7 +89,6 @@ function NeuralBackground() {
         if (p.y < 0 || p.y > h) p.vy *= -1;
       }
 
-      // Connections
       for (let i = 0; i < pts.length; i++) {
         for (let j = i + 1; j < pts.length; j++) {
           const dx = pts[i].x - pts[j].x;
@@ -211,21 +106,19 @@ function NeuralBackground() {
         }
       }
 
-      // Points
       for (const p of pts) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(34, 211, 238, 0.35)';
         ctx.fill();
       }
-
-      animRef.current = requestAnimationFrame(draw);
     };
 
     draw();
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', onResize);
+      observer.disconnect();
     };
   }, []);
 
@@ -355,15 +248,9 @@ export default function SynthesisInProgress({ variant = 0, is404 = false }) {
                 transition={{ delay: 0.3, duration: 1, ease: 'easeOut' }}
                 className="w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 flex-shrink-0"
               >
-                <Canvas
-                  camera={{ position: [0, 0, 4], fov: 50 }}
-                  dpr={[1, 2]}
-                  style={{ background: 'transparent' }}
-                >
-                  <ambientLight intensity={0.6} />
-                  <pointLight position={[5, 5, 5]} intensity={0.8} color="#22d3ee" />
-                  <ParticleSphere />
-                </Canvas>
+                <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><div className="w-16 h-16 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" /></div>}>
+                  <LazyParticleCanvas />
+                </Suspense>
               </motion.div>
 
               {/* Right — Glassmorphism Card */}

@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { processSteps } from '../data/sectionsData';
 
-// Componente de animación molecular mejorado y complejo
-function VisualState({ state }) {
+// Componente de animación molecular — CSS animations (no framer-motion per-particle)
+const VisualState = memo(function VisualState({ state }) {
   
 // Estado 1: Nanoencapsulación (Estilo Oval/Elíptico)
 if (state === 'nanoencapsulation') {
@@ -12,40 +12,30 @@ if (state === 'nanoencapsulation') {
 
   return (
     <div className="relative w-full h-full flex items-center justify-center overflow-visible">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8 }}
-        className="relative w-[400px] h-[500px] flex items-center justify-center"
-      >
+      <div className="relative w-[400px] h-[500px] flex items-center justify-center">
         {/* === NÚCLEO CENTRAL (SOL) === */}
-        <motion.div 
-          className="absolute z-10"
-          animate={{ scale: [1, 1.04, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        >
+        <div className="absolute z-10" style={{ animation: 'pulse-scale 4s ease-in-out infinite' }}>
           <div className="relative w-40 h-40">
             <div className="absolute inset-0 bg-gradient-to-b from-yellow-300 via-orange-400 to-orange-600 rounded-full shadow-[0_0_60px_rgba(251,146,60,0.6)]" />
-            {/* Reflejo giratorio */}
-            <motion.div
+            <div
               className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/25 to-transparent rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              style={{ animation: 'spin-slow 8s linear infinite' }}
             />
           </div>
-        </motion.div>
+        </div>
 
-        {/* === GLOW PULSANTE DETRÁS DEL NÚCLEO === */}
-        <motion.div
+        {/* === GLOW PULSANTE === */}
+        <div
           className="absolute w-48 h-48 rounded-full z-0"
-          style={{ background: 'radial-gradient(circle, rgba(251,146,60,0.25) 0%, transparent 70%)' }}
-          animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0.3, 0.6] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            background: 'radial-gradient(circle, rgba(251,146,60,0.25) 0%, transparent 70%)',
+            animation: 'pulse-glow 3s ease-in-out infinite',
+          }}
         />
 
         {/* === ANILLOS ELÍPTICOS === */}
         {[0.5, 0.75, 1].map((scale, i) => (
-          <motion.div
+          <div
             key={`ring-${i}`}
             className="absolute rounded-[50%]"
             style={{
@@ -53,71 +43,46 @@ if (state === 'nanoencapsulation') {
               height: `${radiusY * 2 * scale}px`,
               border: `2px solid rgba(20, 184, 166, ${i === 2 ? 0.8 : 0.3})`,
               boxShadow: i === 2 ? '0 0 15px rgba(20, 184, 166, 0.4)' : 'none',
-            }}
-            animate={{ 
-              rotate: [0, 2, 0, -2, 0],
-              scale: [1, 1.01, 1, 0.99, 1],
-            }}
-            transition={{ 
-              duration: 8 + i * 3, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
+              animation: `ring-breathe ${8 + i * 3}s ease-in-out infinite`,
             }}
           />
         ))}
 
-        {/* === PARTÍCULAS ORBITALES === */}
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((startAngle, i) => (
-          <motion.div
-            key={`orbiter-${i}`}
-            className="absolute rounded-full"
-            style={{
-              top: '50%',
-              left: '50%',
-              width: i % 2 === 0 ? '2px' : '1.5px',
-              height: i % 2 === 0 ? '2px' : '1.5px',
-              backgroundColor: i % 2 === 0 ? 'rgb(94, 234, 212)' : 'rgb(34, 211, 238)',
-              boxShadow: `0 0 ${i % 2 === 0 ? 8 : 5}px rgba(20, 184, 166, 0.8)`,
-            }}
-            animate={{
-              x: [
-                radiusX * 0.88 * Math.cos((startAngle) * Math.PI / 180),
-                radiusX * 0.88 * Math.cos((startAngle + 90) * Math.PI / 180),
-                radiusX * 0.88 * Math.cos((startAngle + 180) * Math.PI / 180),
-                radiusX * 0.88 * Math.cos((startAngle + 270) * Math.PI / 180),
-                radiusX * 0.88 * Math.cos((startAngle + 360) * Math.PI / 180),
-              ],
-              y: [
-                radiusY * 0.88 * Math.sin((startAngle) * Math.PI / 180),
-                radiusY * 0.88 * Math.sin((startAngle + 90) * Math.PI / 180),
-                radiusY * 0.88 * Math.sin((startAngle + 180) * Math.PI / 180),
-                radiusY * 0.88 * Math.sin((startAngle + 270) * Math.PI / 180),
-                radiusY * 0.88 * Math.sin((startAngle + 360) * Math.PI / 180),
-              ],
-              opacity: [0.3, 1, 0.3, 1, 0.3],
-            }}
-            transition={{
-              duration: 10 + (i % 3) * 2,
-              repeat: Infinity,
-              ease: "linear",
-              delay: i * 0.4,
-            }}
-          />
-        ))}
+        {/* === PARTÍCULAS ORBITALES (reduced 8→6, CSS keyframes) === */}
+        {[0, 60, 120, 180, 240, 300].map((startAngle, i) => {
+          const r = radiusX * 0.88;
+          const rY = radiusY * 0.88;
+          const cx = r * Math.cos((startAngle * Math.PI) / 180);
+          const cy = rY * Math.sin((startAngle * Math.PI) / 180);
+          return (
+            <div
+              key={`orbiter-${i}`}
+              className="absolute rounded-full"
+              style={{
+                top: '50%',
+                left: '50%',
+                width: i % 2 === 0 ? '2px' : '1.5px',
+                height: i % 2 === 0 ? '2px' : '1.5px',
+                backgroundColor: i % 2 === 0 ? 'rgb(94, 234, 212)' : 'rgb(34, 211, 238)',
+                boxShadow: `0 0 ${i % 2 === 0 ? 8 : 5}px rgba(20, 184, 166, 0.8)`,
+                transform: `translate(${cx}px, ${cy}px)`,
+                animation: `indicator-pulse ${2 + (i % 3)}s ease-in-out infinite`,
+                animationDelay: `${i * 0.3}s`,
+              }}
+            />
+          );
+        })}
 
-        {/* === MOLÉCULAS EN EL PERÍMETRO EXTERIOR === */}
-        {[...Array(20)].map((_, i) => {
-          const angleDeg = (i * 360) / 20;
+        {/* === MOLÉCULAS PERÍMETRO (reduced 20→10, CSS) === */}
+        {Array.from({ length: 10 }, (_, i) => {
+          const angleDeg = (i * 360) / 10;
           const angleRad = (angleDeg * Math.PI) / 180;
           const x = radiusX * Math.cos(angleRad);
           const y = radiusY * Math.sin(angleRad);
           const rotation = angleDeg + 90;
 
-          // Cada molécula tiene un leve "respirar" desfasado
-          const breathDelay = i * 0.25;
-
           return (
-            <motion.div
+            <div
               key={`lipid-${i}`}
               className="absolute"
               style={{
@@ -125,55 +90,31 @@ if (state === 'nanoencapsulation') {
                 left: '50%',
                 marginLeft: '-4px',
                 marginTop: '-10px',
-              }}
-              initial={{ opacity: 0, scale: 0.3 }}
-              animate={{
-                x: x,
-                y: y,
-                rotate: rotation,
-                opacity: 1,
-                scale: 1,
-              }}
-              transition={{ 
-                duration: 0.8,
-                delay: i * 0.04,
-                ease: "easeOut" 
+                transform: `translate(${x}px, ${y}px) rotate(${rotation}deg)`,
               }}
             >
-              <motion.div 
+              <div
                 className="flex flex-col items-center"
-                animate={{ scale: [1, 1.15, 1] }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "easeInOut",
-                  delay: breathDelay,
-                }}
+                style={{ animation: `breathe-lipid 3s ease-in-out infinite`, animationDelay: `${i * 0.25}s` }}
               >
-                {/* Cabeza */}
                 <div className="w-3 h-3 bg-cyan-300 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)] z-20" />
-                {/* Conector */}
                 <div className="w-0.5 h-3 bg-teal-500/60" />
-                {/* Cola */}
                 <div className="w-1.5 h-1.5 bg-teal-600 rounded-full" />
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           );
         })}
 
         {/* === ETIQUETA FLOTANTE === */}
-        <motion.div
+        <div
           className="absolute -top-12 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-teal-500/10 backdrop-blur-md rounded-full border border-teal-500/30"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: [0, -6, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          style={{ animation: 'float-y 3s ease-in-out infinite' }}
         >
           <p className="text-teal-300 font-bold text-sm uppercase tracking-wider whitespace-nowrap">
             Protección Molecular
           </p>
-        </motion.div>
-
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -182,132 +123,97 @@ if (state === 'nanoencapsulation') {
   if (state === 'biotech') {
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative w-96 h-96"
-        >
-          {/* Biorreactor (contenedor principal) */}
+        <div className="relative w-96 h-96">
+          {/* Biorreactor */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div 
+            <div
               className="relative w-72 h-80 rounded-3xl border-4 border-cyan-500/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm overflow-hidden"
-              style={{
-                boxShadow: '0 0 40px rgba(6, 182, 212, 0.3), inset 0 0 40px rgba(6, 182, 212, 0.1)'
-              }}
+              style={{ boxShadow: '0 0 40px rgba(6, 182, 212, 0.3), inset 0 0 40px rgba(6, 182, 212, 0.1)' }}
             >
               {/* Líquido de cultivo */}
-              <motion.div
+              <div
                 className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-500/40 via-teal-500/30 to-transparent"
-                initial={{ height: '20%' }}
-                animate={{ height: ['20%', '85%', '85%', '20%'] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+                style={{ animation: 'liquid-fill 8s ease-in-out infinite' }}
               >
-                {/* Burbujas de fermentación */}
-                {[...Array(15)].map((_, i) => (
-                  <motion.div
+                {/* Burbujas (reduced 15→6) */}
+                {Array.from({ length: 6 }, (_, i) => (
+                  <div
                     key={`bubble-${i}`}
                     className="absolute w-3 h-3 bg-cyan-300/60 rounded-full"
                     style={{
-                      left: `${10 + (i * 6)}%`,
-                      bottom: '5%'
-                    }}
-                    animate={{
-                      y: [0, -300],
-                      opacity: [0, 1, 1, 0],
-                      scale: [0.5, 1, 1.2, 0]
-                    }}
-                    transition={{
-                      duration: 3 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: i * 0.3,
-                      ease: "easeOut"
+                      left: `${10 + i * 15}%`,
+                      bottom: '5%',
+                      animation: `bubble-rise ${3 + (i % 3) * 0.7}s ease-out infinite`,
+                      animationDelay: `${i * 0.5}s`,
                     }}
                   />
                 ))}
-              </motion.div>
+              </div>
 
-              {/* Microorganismos (células) */}
-              {[...Array(20)].map((_, i) => (
-                <motion.div
+              {/* Microorganismos (reduced 20→8) */}
+              {Array.from({ length: 8 }, (_, i) => (
+                <div
                   key={`cell-${i}`}
                   className="absolute w-4 h-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full"
                   style={{
-                    left: `${10 + Math.random() * 80}%`,
-                    top: `${20 + Math.random() * 60}%`,
-                    boxShadow: '0 0 10px rgba(52, 211, 153, 0.6)'
-                  }}
-                  animate={{
-                    x: [0, Math.random() * 40 - 20, 0],
-                    y: [0, Math.random() * 40 - 20, 0],
-                    scale: [1, 1.2, 1]
-                  }}
-                  transition={{
-                    duration: 4 + Math.random() * 2,
-                    repeat: Infinity,
-                    delay: i * 0.2
+                    left: `${10 + (i * 10) % 80}%`,
+                    top: `${20 + (i * 8) % 60}%`,
+                    boxShadow: '0 0 10px rgba(52, 211, 153, 0.6)',
+                    '--dx': `${((i % 3) - 1) * 20}px`,
+                    '--dy': `${((i % 2) - 0.5) * 30}px`,
+                    animation: `cell-drift ${4 + (i % 3)}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.3}s`,
                   }}
                 />
               ))}
 
               {/* Agitador central */}
-              <motion.div
+              <div
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-full bg-gradient-to-b from-slate-600 to-transparent"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                style={{ transformOrigin: 'center 10%' }}
+                style={{ animation: 'spin-slow 3s linear infinite', transformOrigin: 'center 10%' }}
               >
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-600" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-1 h-32 bg-slate-600" />
-              </motion.div>
+              </div>
 
-              {/* Indicadores de control */}
+              {/* Indicadores */}
               <div className="absolute top-4 left-4 space-y-2">
                 {['pH', 'T°', 'O₂'].map((label, i) => (
-                  <motion.div
+                  <div
                     key={label}
                     className="flex items-center gap-2"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+                    style={{ animation: `indicator-pulse 2s ease-in-out infinite`, animationDelay: `${i * 0.3}s` }}
                   >
                     <div className="w-2 h-2 bg-green-400 rounded-full" />
                     <span className="text-xs text-cyan-300 font-mono">{label}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
 
-          {/* Flujo de entrada/salida */}
-          <motion.div
-            className="absolute top-10 right-0 flex items-center gap-2"
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
+          {/* Flujo de entrada */}
+          <div className="absolute top-10 right-0 flex items-center gap-2" style={{ animation: 'indicator-pulse 2s ease-in-out infinite' }}>
             <div className="w-20 h-1 bg-gradient-to-r from-teal-500 to-transparent" />
             <div className="text-xs text-teal-300">Input</div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            className="absolute bottom-10 left-0 flex items-center gap-2"
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-          >
+          {/* Flujo de salida */}
+          <div className="absolute bottom-10 left-0 flex items-center gap-2" style={{ animation: 'indicator-pulse 2s ease-in-out infinite', animationDelay: '1s' }}>
             <div className="text-xs text-cyan-300">Output</div>
             <div className="w-20 h-1 bg-gradient-to-l from-cyan-500 to-transparent" />
-          </motion.div>
+          </div>
 
-          {/* Etiqueta flotante */}
-          <motion.div
+          {/* Etiqueta */}
+          <div
             className="absolute -top-20 left-1/2 -translate-x-1/2 px-6 py-3 bg-cyan-500/10 backdrop-blur-md rounded-full border border-cyan-500/30"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            style={{ animation: 'float-y 2s ease-in-out infinite' }}
           >
             <p className="text-cyan-300 font-bold text-sm uppercase tracking-wider whitespace-nowrap">
               Fermentación de Precisión
             </p>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -316,182 +222,133 @@ if (state === 'nanoencapsulation') {
   if (state === 'drying') {
     return (
       <div className="relative w-full h-full flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          className="relative w-96 h-96"
-        >
-          {/* Torre de secado */}
+        <div className="relative w-96 h-96">
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {/* Atomizador superior */}
-            <motion.div className="relative">
+            {/* Atomizador */}
+            <div className="relative">
               <div className="w-16 h-8 bg-gradient-to-b from-slate-600 to-slate-700 rounded-t-full border-2 border-slate-500" />
               
-              {/* Spray de gotas */}
-              {[...Array(30)].map((_, i) => (
-                <motion.div
+              {/* Spray drops (reduced 30→10) */}
+              {Array.from({ length: 10 }, (_, i) => (
+                <div
                   key={`drop-${i}`}
-                  className="absolute top-8 left-1/2 w-3 h-3 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full"
+                  className="absolute top-8 w-3 h-3 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-full"
                   style={{
-                    left: `${50 + (Math.random() - 0.5) * 100}%`,
-                  }}
-                  initial={{ opacity: 1, scale: 1 }}
-                  animate={{
-                    y: [0, 280],
-                    x: [(Math.random() - 0.5) * 40, (Math.random() - 0.5) * 80],
-                    opacity: [1, 0.8, 0],
-                    scale: [1, 0.3, 0.1]
-                  }}
-                  transition={{
-                    duration: 2.5,
-                    repeat: Infinity,
-                    delay: i * 0.1,
-                    ease: "easeIn"
+                    left: `${50 + ((i % 5) - 2) * 20}%`,
+                    '--dx-start': `${((i % 3) - 1) * 15}px`,
+                    '--dx-end': `${((i % 5) - 2) * 30}px`,
+                    animation: `drop-fall 2.5s ease-in infinite`,
+                    animationDelay: `${i * 0.25}s`,
                   }}
                 />
               ))}
-            </motion.div>
+            </div>
 
             {/* Cámara de secado */}
-            <motion.div 
+            <div
               className="relative w-64 h-80 mt-2 rounded-3xl border-4 border-blue-500/40 bg-gradient-to-b from-slate-800/60 to-slate-900/80 backdrop-blur-sm overflow-hidden"
-              style={{
-                boxShadow: '0 0 40px rgba(59, 130, 246, 0.2), inset 0 0 60px rgba(59, 130, 246, 0.05)'
-              }}
+              style={{ boxShadow: '0 0 40px rgba(59, 130, 246, 0.2), inset 0 0 60px rgba(59, 130, 246, 0.05)' }}
             >
-              {/* Aire caliente (ondas de calor) */}
-              {[...Array(5)].map((_, i) => (
-                <motion.div
+              {/* Heat waves (reduced 5→3) */}
+              {Array.from({ length: 3 }, (_, i) => (
+                <div
                   key={`heat-${i}`}
                   className="absolute left-0 right-0 h-2 bg-gradient-to-r from-transparent via-orange-400/20 to-transparent blur-sm"
-                  style={{ top: `${20 + i * 15}%` }}
-                  animate={{
-                    x: ['-100%', '100%'],
-                    opacity: [0, 0.6, 0]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: i * 0.4
+                  style={{
+                    top: `${25 + i * 20}%`,
+                    animation: `heat-wave 2s linear infinite`,
+                    animationDelay: `${i * 0.6}s`,
                   }}
                 />
               ))}
 
-              {/* Partículas secándose */}
-              {[...Array(40)].map((_, i) => (
-                <motion.div
+              {/* Drying particles (reduced 40→12) */}
+              {Array.from({ length: 12 }, (_, i) => (
+                <div
                   key={`particle-${i}`}
                   className="absolute w-2 h-2 bg-white rounded-full"
                   style={{
-                    left: `${20 + Math.random() * 60}%`,
+                    left: `${20 + (i * 5) % 60}%`,
                     top: '20%',
-                    boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)'
-                  }}
-                  animate={{
-                    y: [0, 220],
-                    opacity: [0, 1, 1],
-                    scale: [0.5, 1, 1]
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: i * 0.08,
-                    ease: "linear"
+                    boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)',
+                    animation: `particle-fall 3s linear infinite`,
+                    animationDelay: `${i * 0.25}s`,
                   }}
                 />
               ))}
 
-              {/* Polvo acumulándose en el fondo */}
-              <motion.div
+              {/* Polvo acumulándose */}
+              <div
                 className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white/40 via-slate-200/20 to-transparent rounded-b-3xl"
-                initial={{ height: '10%' }}
-                animate={{ height: ['10%', '25%', '25%', '10%'] }}
-                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                style={{ animation: 'powder-fill 10s ease-in-out infinite' }}
               >
-                {/* Textura del polvo */}
+                {/* Powder texture (reduced 50→15) */}
                 <div className="absolute inset-0 opacity-60">
-                  {[...Array(50)].map((_, i) => (
+                  {Array.from({ length: 15 }, (_, i) => (
                     <div
                       key={`powder-${i}`}
                       className="absolute w-1 h-1 bg-white rounded-full"
                       style={{
-                        left: `${Math.random() * 100}%`,
-                        bottom: `${Math.random() * 100}%`
+                        left: `${(i * 7) % 100}%`,
+                        bottom: `${(i * 13) % 100}%`,
                       }}
                     />
                   ))}
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Indicadores de temperatura */}
+              {/* Temperatura */}
               <div className="absolute top-4 right-4 space-y-2">
-                <motion.div
-                  className="flex items-center gap-2"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
+                <div className="flex items-center gap-2" style={{ animation: 'indicator-pulse 1.5s ease-in-out infinite' }}>
                   <div className="w-2 h-2 bg-orange-400 rounded-full" />
                   <span className="text-xs text-orange-300 font-mono">180°C</span>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Salida de polvo */}
-            <motion.div
-              className="w-20 h-8 bg-gradient-to-b from-slate-700 to-slate-800 rounded-b-full border-2 border-slate-500 mt-2 relative overflow-hidden"
-            >
-              <motion.div
+            <div className="w-20 h-8 bg-gradient-to-b from-slate-700 to-slate-800 rounded-b-full border-2 border-slate-500 mt-2 relative overflow-hidden">
+              <div
                 className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-6 bg-gradient-to-b from-white to-slate-300"
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity }}
+                style={{ animation: 'indicator-pulse 2s ease-in-out infinite' }}
               />
-            </motion.div>
+            </div>
           </div>
 
-          {/* Cristales de hielo (liofilización) */}
-          {[...Array(8)].map((_, i) => (
-            <motion.div
+          {/* Cristales (reduced 8→4) */}
+          {Array.from({ length: 4 }, (_, i) => (
+            <div
               key={`crystal-${i}`}
               className="absolute"
               style={{
-                top: `${20 + Math.random() * 60}%`,
-                left: `${10 + Math.random() * 80}%`
-              }}
-              animate={{
-                rotate: 360,
-                scale: [1, 1.3, 1],
-                opacity: [0.3, 0.8, 0.3]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i * 0.4
+                top: `${25 + (i * 15) % 55}%`,
+                left: `${15 + (i * 20) % 70}%`,
+                animation: `crystal-spin 3s ease-in-out infinite`,
+                animationDelay: `${i * 0.7}s`,
               }}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 2L10 18M2 10L18 10M5 5L15 15M15 5L5 15" stroke="rgba(147, 197, 253, 0.5)" strokeWidth="1.5" />
               </svg>
-            </motion.div>
+            </div>
           ))}
 
-          {/* Etiqueta flotante */}
-          <motion.div
+          {/* Etiqueta */}
+          <div
             className="absolute -top-20 left-1/2 -translate-x-1/2 px-6 py-3 bg-blue-500/10 backdrop-blur-md rounded-full border border-blue-500/30"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+            style={{ animation: 'float-y 2s ease-in-out infinite' }}
           >
             <p className="text-blue-300 font-bold text-sm uppercase tracking-wider whitespace-nowrap">
               Secado Avanzado
             </p>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return null;
-}
+});
 
 export default function ProcessSection() {
   const [activeIndex, setActiveIndex] = useState(0);

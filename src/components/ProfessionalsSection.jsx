@@ -120,6 +120,8 @@ export default function ProfessionalsSection() {
                       <img 
                         src={person.placeholder} 
                         alt={person.name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                       />
                     </div>

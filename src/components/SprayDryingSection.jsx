@@ -28,6 +28,9 @@ function SprayDryerDiagram({ progress, particleCount = 20 }) {
   const outletTemp = Math.round(50 + (1 - progress) * 15);
   const particlesFrozen = progress > 0.65;
 
+  /* Clamp to avoid unnecessary re-renders */
+  const effectiveParticles = Math.min(particleCount, 12);
+
   return (
     <div className="relative w-full max-w-md mx-auto">
       <svg viewBox="0 0 300 420" className="w-full h-auto" fill="none">
@@ -113,7 +116,7 @@ function SprayDryerDiagram({ progress, particleCount = 20 }) {
 
       {/* Animated particles inside dryer */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: particleCount }).map((_, i) => {
+        {Array.from({ length: effectiveParticles }).map((_, i) => {
           const left = 30 + Math.random() * 40; // percentage
           const delay = Math.random() * 3;
           const duration = 2 + Math.random() * 2;
@@ -300,7 +303,7 @@ export default function SprayDryingSection() {
         <div className={`grid gap-10 items-start ${isMobile ? 'grid-cols-1 gap-8' : 'grid-cols-1 lg:grid-cols-2 lg:gap-16'}`}>
           {/* Spray Dryer Diagram — fewer particles on mobile */}
           <motion.div {...stagger(0.3)}>
-            <SprayDryerDiagram progress={0.5} particleCount={isMobile ? 8 : 20} />
+            <SprayDryerDiagram progress={0.5} particleCount={isMobile ? 5 : 14} />
           </motion.div>
 
           {/* Control Points */}
@@ -386,7 +389,7 @@ export default function SprayDryingSection() {
               <div className="flex items-center gap-6 flex-shrink-0 justify-center">
                 {/* Fluid state */}
                 <div className="relative w-20 h-20 rounded-xl border border-orange-500/20 bg-orange-500/5 flex items-center justify-center overflow-hidden">
-                  {[...Array(isMobile ? 5 : 8)].map((_, i) => (
+                  {[...Array(isMobile ? 3 : 8)].map((_, i) => (
                     <motion.div
                       key={`fluid-${i}`}
                       className="absolute w-1.5 h-1.5 rounded-full bg-orange-400"
@@ -414,7 +417,7 @@ export default function SprayDryingSection() {
 
                 {/* Frozen state */}
                 <div className="relative w-20 h-20 rounded-xl border border-teal-500/20 bg-teal-500/5 flex items-center justify-center overflow-hidden">
-                  {[...Array(isMobile ? 5 : 8)].map((_, i) => (
+                  {[...Array(isMobile ? 3 : 8)].map((_, i) => (
                     <div
                       key={`frozen-${i}`}
                       className="absolute w-1.5 h-1.5 rounded-full bg-teal-400"

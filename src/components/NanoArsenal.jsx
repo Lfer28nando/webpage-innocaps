@@ -1,9 +1,41 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Environment, OrbitControls } from '@react-three/drei';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import GlossaryTooltip from './GlossaryTooltip';
+
+/* ═══════════════════════════════════════════
+   DEVICE TIER (shared pattern)
+   ═══════════════════════════════════════════ */
+function getDeviceTier() {
+  if (typeof window === 'undefined') return 'low';
+  const isMobile = /Android|iPhone|iPad|iPod|Opera Mini/i.test(navigator.userAgent)
+    || window.innerWidth < 768;
+  const cores = navigator.hardwareConcurrency || 2;
+  const memory = navigator.deviceMemory || 2;
+  if (isMobile || cores <= 4 || memory <= 4) return 'low';
+  if (cores <= 8 && memory <= 8) return 'mid';
+  return 'high';
+}
+
+const TIER = getDeviceTier();
+const IS_LOW = TIER === 'low';
+
+/* Intersection Observer hook — lazy-load Canvas */
+function useInView(ref, rootMargin = '200px') {
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { rootMargin },
+    );
+    obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [ref, rootMargin]);
+  return inView;
+}
 
 /* ═══════════════════════════════════════════
    DATA
@@ -107,10 +139,16 @@ const molecules = [
 /* ═══════════════════════════════════════════
    3D SCENE HELPERS
    ═══════════════════════════════════════════ */
+/* Particle counts scale with device tier */
+const PARTICLE_SCALE = IS_LOW ? 0.3 : TIER === 'mid' ? 0.6 : 1;
+const SPHERE_DETAIL = IS_LOW ? 24 : TIER === 'mid' ? 40 : 64;
+
 function ParticleField({ positions, color, size = 0.02, opacity = 0.5 }) {
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    // On low-end, use fewer positions
+    const count = Math.floor(positions.length / 3 * PARTICLE_SCALE) * 3;
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions.slice(0, count), 3));
     return g;
   }, [positions]);
 
@@ -206,7 +244,7 @@ function LiposomeMesh({ active, decomposed }) {
       {/* --- outer bilayer shell --- */}
       <group>
         <mesh>
-          <sphereGeometry args={[1.5, 64, 64]} />
+          <sphereGeometry args={[1.5, SPHERE_DETAIL, SPHERE_DETAIL]} />
           <meshPhysicalMaterial
             color="#14b8a6"
             transparent
@@ -225,7 +263,7 @@ function LiposomeMesh({ active, decomposed }) {
       {/* --- mid layer (wireframe) --- */}
       <group>
         <mesh>
-          <sphereGeometry args={[1.1, 48, 48]} />
+          <sphereGeometry args={[1.1, Math.round(SPHERE_DETAIL * 0.75), Math.round(SPHERE_DETAIL * 0.75)]} />
           <meshBasicMaterial color="#0d9488" wireframe transparent opacity={0.08} />
         </mesh>
         <ParticleField positions={midPts} color="#99f6e4" size={0.012} opacity={0.4} />
@@ -234,7 +272,7 @@ function LiposomeMesh({ active, decomposed }) {
       {/* --- aqueous core --- */}
       <group>
         <mesh>
-          <sphereGeometry args={[0.6, 32, 32]} />
+          <sphereGeometry args={[0.6, Math.round(SPHERE_DETAIL * 0.5), Math.round(SPHERE_DETAIL * 0.5)]} />
           <meshPhysicalMaterial
             color="#06b6d4"
             roughness={0.15}
@@ -415,9 +453,10 @@ function NLCMesh({ active, decomposed }) {
    ═══════════════════════════════════════════ */
 function AmbientParticles() {
   const ref = useRef();
+  const count = IS_LOW ? 100 : TIER === 'mid' ? 300 : 600;
   const positions = useMemo(() => {
-    const pts = new Float32Array(600 * 3);
-    for (let i = 0; i < 600; i++) {
+    const pts = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
       pts[i * 3] = (Math.random() - 0.5) * 12;
       pts[i * 3 + 1] = (Math.random() - 0.5) * 12;
       pts[i * 3 + 2] = (Math.random() - 0.5) * 12;
@@ -439,22 +478,38 @@ function AmbientParticles() {
 /* ═══════════════════════════════════════════
    COMPLETE 3D SCENE
    ═══════════════════════════════════════════ */
+const MoleculeComponents = [LiposomeMesh, NiosomeMesh, SLNMesh, NLCMesh];
+
 function MoleculeScene({ activeIndex, decomposed }) {
+  /* Only mount the ACTIVE molecule — saves 75% GPU work */
+  const ActiveMolecule = MoleculeComponents[activeIndex];
+
   return (
     <>
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[5, 5, 5]} intensity={0.9} />
-      <pointLight position={[-4, -2, 4]} intensity={0.5} color="#14b8a6" />
-      <pointLight position={[4, 3, -3]} intensity={0.35} color="#8b5cf6" />
+      {IS_LOW ? (
+        /* Low-end: 2 lights only */
+        <>
+          <ambientLight intensity={0.5} />
+          <directionalLight position={[4, 4, 4]} intensity={1.2} />
+        </>
+      ) : (
+        <>
+          <ambientLight intensity={0.35} />
+          <directionalLight position={[5, 5, 5]} intensity={0.9} />
+          <pointLight position={[-4, -2, 4]} intensity={0.5} color="#14b8a6" />
+          <pointLight position={[4, 3, -3]} intensity={0.35} color="#8b5cf6" />
+        </>
+      )}
 
-      <Float speed={1.2} rotationIntensity={0.12} floatIntensity={0.25}>
-        <LiposomeMesh active={activeIndex === 0} decomposed={decomposed && activeIndex === 0} />
-        <NiosomeMesh active={activeIndex === 1} decomposed={decomposed && activeIndex === 1} />
-        <SLNMesh active={activeIndex === 2} decomposed={decomposed && activeIndex === 2} />
-        <NLCMesh active={activeIndex === 3} decomposed={decomposed && activeIndex === 3} />
+      <Float
+        speed={IS_LOW ? 0 : 1.2}
+        rotationIntensity={IS_LOW ? 0 : 0.12}
+        floatIntensity={IS_LOW ? 0 : 0.25}
+      >
+        <ActiveMolecule active decomposed={decomposed} />
       </Float>
 
-      <AmbientParticles />
+      {!IS_LOW && <AmbientParticles />}
 
       <OrbitControls
         enableZoom={false}
@@ -462,7 +517,7 @@ function MoleculeScene({ activeIndex, decomposed }) {
         minPolarAngle={Math.PI / 3}
         maxPolarAngle={Math.PI / 1.5}
       />
-      <Environment preset="night" />
+      {!IS_LOW && <Environment preset="night" />}
     </>
   );
 }
@@ -576,6 +631,10 @@ export default function NanoArsenal() {
   const [decomposed, setDecomposed] = useState(false);
   const mol = molecules[activeIndex];
 
+  /* Lazy-load the 3D Canvas when section enters viewport */
+  const canvasWrapRef = useRef(null);
+  const canvasReady = useInView(canvasWrapRef, '300px');
+
   const handleNav = (i) => {
     if (i === activeIndex) return;
     setActiveIndex(i);
@@ -609,15 +668,28 @@ export default function NanoArsenal() {
         {/* Main content area */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center min-h-[560px]">
           {/* ── 3D CANVAS ── */}
-          <motion.div {...stagger(0.1)} className="relative h-[420px] sm:h-[500px] lg:h-[580px]">
+          <motion.div {...stagger(0.1)} className="relative h-[420px] sm:h-[500px] lg:h-[580px]" ref={canvasWrapRef}>
             <div className="absolute inset-0 rounded-3xl border border-slate-800/50 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
-              <Canvas
-                camera={{ position: [0, 0, 4.5], fov: 45 }}
-                dpr={[1, 2]}
-                style={{ background: 'transparent' }}
-              >
-                <MoleculeScene activeIndex={activeIndex} decomposed={decomposed} />
-              </Canvas>
+              {canvasReady ? (
+                <Canvas
+                  camera={{ position: [0, 0, 4.5], fov: 45 }}
+                  dpr={IS_LOW ? [1, 1] : TIER === 'mid' ? [1, 1.5] : [1, 2]}
+                  gl={{
+                    alpha: true,
+                    antialias: !IS_LOW,
+                    powerPreference: 'high-performance',
+                    stencil: false,
+                  }}
+                  style={{ background: 'transparent' }}
+                >
+                  <MoleculeScene activeIndex={activeIndex} decomposed={decomposed} />
+                </Canvas>
+              ) : (
+                /* Placeholder while Canvas lazy-loads */
+                <div className="flex items-center justify-center h-full">
+                  <span className="text-[10px] font-mono text-slate-600 tracking-[0.25em] uppercase">cargando escena 3d</span>
+                </div>
+              )}
 
               {/* Decompose button */}
               <button
