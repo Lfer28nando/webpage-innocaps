@@ -361,6 +361,23 @@ export default function ProcessSection() {
 
   return (
     <section className="relative bg-slate-950 light:bg-slate-100 py-20 md:py-32 overflow-hidden transition-colors duration-300">
+      {/* ── FONDOS (estilo hero) ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+        <img
+          src="/bg2.webp"
+          alt=""
+          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '50%', objectFit: 'cover', opacity: 0.4 }}
+          loading="lazy"
+        />
+        <img
+          src="/bg3.webp"
+          alt=""
+          style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '50%', objectFit: 'cover', opacity: 0.4 }}
+          loading="lazy"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/50 to-slate-950/80" />
+      </div>
+
       {/* Degradado superior */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-slate-950 light:from-slate-100 to-transparent z-20 pointer-events-none"></div>
       

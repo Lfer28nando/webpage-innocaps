@@ -1,12 +1,12 @@
 ---
 // Nuestros Aliados - Infinite Marquee
 const allies = [
-  { name: 'Aliado 1', logo: '/allies/ally-1.svg' },
-  { name: 'Aliado 2', logo: '/allies/ally-2.svg' },
-  { name: 'Aliado 3', logo: '/allies/ally-3.svg' },
-  { name: 'Aliado 4', logo: '/allies/ally-4.svg' },
-  { name: 'Aliado 5', logo: '/allies/ally-5.svg' },
-  { name: 'Aliado 6', logo: '/allies/ally-6.svg' },
+  { name: 'AI', logo: '/allies/ai.png' },
+  { name: 'Biotecno', logo: '/allies/Biotecno-1.png' },
+  { name: 'Cecoltec', logo: '/allies/cecoltec.webp' },
+  { name: 'Ingeniería de Alimentos', logo: '/allies/ingenieriadealimentos.png' },
+  { name: 'Química Hongos', logo: '/allies/quimicahongos.jpg' },
+  { name: 'Red TP', logo: '/allies/red-tp.png' },
 ];
 ---
 
@@ -48,24 +48,13 @@ const allies = [
       {/* Primera copia */}
       {allies.map((ally) => (
         <div class="marquee-item flex-shrink-0 w-48 md:w-56 h-24 md:h-28 rounded-2xl border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center px-6 transition-all duration-300 hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-500/10 group">
-          <div class="flex flex-col items-center gap-2 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
-            <!-- Placeholder icon -->
-            <svg class="w-10 h-10 text-slate-500 group-hover:text-teal-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-            <span class="text-xs text-slate-600 group-hover:text-slate-400 font-mono tracking-wide transition-colors duration-300">{ally.name}</span>
-          </div>
+          <img src={ally.logo} alt={ally.name} class="max-h-16 max-w-[140px] object-contain opacity-70 group-hover:opacity-100 transition-all duration-300" />
         </div>
       ))}
       {/* Segunda copia (para el loop continuo) */}
       {allies.map((ally) => (
         <div class="marquee-item flex-shrink-0 w-48 md:w-56 h-24 md:h-28 rounded-2xl border border-slate-700/50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center px-6 transition-all duration-300 hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-500/10 group">
-          <div class="flex flex-col items-center gap-2 opacity-40 group-hover:opacity-80 transition-opacity duration-300">
-            <svg class="w-10 h-10 text-slate-500 group-hover:text-teal-400 transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.41a2.25 2.25 0 013.182 0l2.909 2.91m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-            <span class="text-xs text-slate-600 group-hover:text-slate-400 font-mono tracking-wide transition-colors duration-300">{ally.name}</span>
-          </div>
+          <img src={ally.logo} alt={ally.name} class="max-h-16 max-w-[140px] object-contain opacity-70 group-hover:opacity-100 transition-all duration-300" />
         </div>
       ))}
     </div>
